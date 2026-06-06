@@ -211,13 +211,12 @@ function rowHtml(it) {
   const u = it.w || 0;
   const owned = it._apt ? 1 : (it.q || 1);          // limit = ile posiadasz
   const q = Math.min(qtyOf(it), owned);
-  const ut = u ? u + " g" : "—";
+  const ut = u ? String(u) : "—";
   const uw = it.u ? ` <span class=uwg title="${esc(it.u)}">ⓘ</span>` : "";
   const pw = it._r ? ` <span class=powod>(${esc(it._r)})</span>` : "";
   return `<tr class="row${q === 0 ? " off" : ""}" data-name="${esc(it.n)}" data-w="${u}" data-max="${owned}" data-def="${defQty(it)}"${it._apt ? " data-apt=1" : ""}${it._excl ? " data-excl=1" : ""}>
     <td>${esc(it.n)}${uw}${pw}</td>
-    <td class=qtycell><button type=button class=minus>−</button>
-      <span class=qv>${q}</span><span class=qmax>/${owned}</span><button type=button class=plus>+</button></td>
+    <td class=qtycell><button type=button class=minus>−</button><span class=qty><span class=qv>${q}</span><span class=qmax>/${owned}</span></span><button type=button class=plus>+</button></td>
     <td class=n>${ut}</td><td class="n rt">${fmt(u * q)}</td></tr>`;
 }
 

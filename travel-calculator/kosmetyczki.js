@@ -53,11 +53,10 @@ function groups() {
 function rowHtml(code, it) {
   const u = it.w || 0;
   const q = qtyOf(code, it);
-  const ut = u ? u + " g" : "—";
+  const ut = u ? String(u) : "—";
   return `<tr class="row${q === 0 ? " off" : ""}" data-name="${esc(it.n)}" data-code="${esc(code)}" data-w="${u}">
     <td>${esc(it.n)}</td>
-    <td class=qtycell><button type=button class=minus>−</button>
-      <span class=qv>${q}</span><button type=button class=plus>+</button></td>
+    <td class=qtycell><button type=button class=minus>−</button><span class=qty><span class=qv>${q}</span></span><button type=button class=plus>+</button></td>
     <td class=n>${ut}</td><td class="n rt">${fmt(u * q)}</td></tr>`;
 }
 
