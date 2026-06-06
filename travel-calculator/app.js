@@ -6,7 +6,8 @@ let DATA = null;
 const STATE = {
   tripId: "",            // "" = filtrowanie ręczne
   pasmo: "do_3000",
-  snieg: "dowolnie",     // dowolnie | tak | nie
+  temp: "dodatnie",      // najzimniejszy próg: dodatnie|chlodno|mroz|silny_mroz
+  lod: "dowolnie",       // dowolnie | tak | nie
   tags: new Set(),
   q: "",                 // szukajka
   showExcluded: false,
@@ -45,6 +46,14 @@ function init() {
     `<option value="${p}">${p}</option>`).join("");
   $("#pasmo").value = STATE.pasmo;
 
+  // zakres temperatur (wg rangi rosnąco — od ciepła do silnego mrozu)
+  const tlab = DATA.temperatury || {};
+  const temps = Object.keys(DATA.temp_rank || {})
+    .sort((a, b) => DATA.temp_rank[a] - DATA.temp_rank[b]);
+  $("#temp").innerHTML = temps.map(t =>
+    `<option value="${t}" title="${esc(tlab[t] || "")}">${t.replace("_", " ")}</option>`).join("");
+  $("#temp").value = STATE.temp;
+
   // chipy aktywności
   const tg = DATA.tagi_aktywnosci;
   $("#tags").innerHTML = Object.keys(tg).map(t =>
@@ -53,7 +62,8 @@ function init() {
   // zdarzenia
   trip.onchange = () => applyTrip(trip.value);
   $("#pasmo").onchange = e => { STATE.pasmo = e.target.value; render(); };
-  $("#snieg").onchange = e => { STATE.snieg = e.target.value; render(); };
+  $("#temp").onchange = e => { STATE.temp = e.target.value; render(); };
+  $("#lod").onchange = e => { STATE.lod = e.target.value; render(); };
   $("#search").oninput = e => { STATE.q = e.target.value.trim(); render(); };
   $("#tags").onclick = e => {
     const c = e.target.closest(".chip"); if (!c) return;
@@ -104,11 +114,13 @@ function applyTrip(id) {
   if (t) {
     STATE.tags = new Set(t.tagi);
     STATE.pasmo = t.pasmo || "do_3000";
-    STATE.snieg = t.snieg == null ? "dowolnie" : (t.snieg ? "tak" : "nie");
+    STATE.temp = t.temperatura || "dodatnie";
+    STATE.lod = t.lod == null ? "dowolnie" : (t.lod ? "tak" : "nie");
   }
   STATE.qty = load();   // wczytaj zapamiętane ilości dla tego wyjazdu
   $("#pasmo").value = STATE.pasmo;
-  $("#snieg").value = STATE.snieg;
+  $("#temp").value = STATE.temp;
+  $("#lod").value = STATE.lod;
   syncChips();
   render();
 }
@@ -125,7 +137,9 @@ function load() { try { return JSON.parse(localStorage.getItem(lsKey())) || {}; 
 // ---------- filtrowanie ----------
 function matchTags(it) { return it.t.some(t => STATE.tags.has(t)); }
 function inPasmo(it) { return rank(it.p) <= rank(STATE.pasmo); }
-function snowOK(it) { return !(STATE.snieg === "nie" && it.s); }
+function trank(t) { return (DATA.temp_rank && DATA.temp_rank[t] != null) ? DATA.temp_rank[t] : 0; }
+function tempOK(it) { return it.temp == null || trank(it.temp) <= trank(STATE.temp); }
+function lodOK(it) { return !(STATE.lod === "nie" && it.lod); }
 function searchOK(it) { return !STATE.q || it.n.toLowerCase().includes(STATE.q.toLowerCase()); }
 
 function defQty(it) {
@@ -146,19 +160,20 @@ function compute() {
     const tagged = matchTags(it);
     const forced = dodaj.has(it.n);
     const removed = usun.has(it.n);
-    const cand = forced || (tagged && inPasmo(it) && snowOK(it) && !removed);
+    const cand = forced || (tagged && inPasmo(it) && tempOK(it) && lodOK(it) && !removed);
     if (cand) { main.push(it); return; }
     if (tagged && searchOK(it)) {
       let r = removed ? "decyzja: nie bierzemy"
         : rank(it.p) > rank(STATE.pasmo) ? "pasmo " + it.p
-        : (STATE.snieg === "nie" && it.s) ? "tylko przy śniegu" : null;
+        : !tempOK(it) ? "cieplej niż " + STATE.temp.replace("_", " ")
+        : (STATE.lod === "nie" && it.lod) ? "tylko na śniegu/lodzie" : null;
       if (r) excl.push(Object.assign({}, it, { _r: r }));
     }
   });
   if (t) {  // apteczki wyjazdu jako pozycje
     t.apteczki.forEach(code => {
       const a = DATA.apteczki[code];
-      if (a) main.push({ n: a.n, k: "Apteczka", f: "Apteczka", p: "niskie", s: false, w: a.w, q: 1, t: [], _apt: true });
+      if (a) main.push({ n: a.n, k: "Apteczka", f: "Apteczka", p: "niskie", w: a.w, q: 1, t: [], _apt: true });
     });
   }
   return { main, excl };
