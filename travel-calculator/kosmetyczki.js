@@ -69,7 +69,7 @@ function render() {
     const items = (k.items || []).filter(it => matchQ(it.n));
     const opis = k.opis ? `<div class=exnote>${esc(k.opis)}</div>` : "";
     return `<section class="cat sec"><h3><span>${esc(k.n || code)}</span><span class=sub>—</span></h3>
-      ${opis}<table><tr><th>Kosmetyk</th><th class=q>Ilość</th><th class=n>/szt</th><th class=n>Razem</th></tr>
+      ${opis}<table><tr><th>Kosmetyk</th><th class=q>Ilość</th><th class=n>g/szt</th><th class=n>Razem</th></tr>
       ${items.map(it => rowHtml(code, it)).join("")}</table></section>`;
   }).join("") + `</div>`;
   recompute();

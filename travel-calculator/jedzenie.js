@@ -80,7 +80,7 @@ function render() {
   if (!gs.length) { app.innerHTML = `<p class=empty>Brak pozycji dla tych filtrów.</p>`; recompute(); return; }
   app.innerHTML = `<div class=cats>` + gs.map(([cat, items]) =>
     `<section class="cat sec"><h3><span>${esc(cat)}</span><span class=sub>—</span></h3>
-      <table><tr><th>Pozycja</th><th class=q>Ilość</th><th class=n>/szt</th><th class=n>Razem</th></tr>
+      <table><tr><th>Pozycja</th><th class=q>Ilość</th><th class=n>g/szt</th><th class=n>Razem</th></tr>
       ${items.map(rowHtml).join("")}</table></section>`).join("") + `</div>`;
   recompute();
 }

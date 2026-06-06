@@ -217,14 +217,14 @@ function rowHtml(it) {
   return `<tr class="row${q === 0 ? " off" : ""}" data-name="${esc(it.n)}" data-w="${u}" data-max="${owned}" data-def="${defQty(it)}"${it._apt ? " data-apt=1" : ""}${it._excl ? " data-excl=1" : ""}>
     <td>${esc(it.n)}${uw}${pw}</td>
     <td class=qtycell><button type=button class=minus>−</button>
-      <span class=qv>${q}</span><button type=button class=plus>+</button></td>
+      <span class=qv>${q}</span><span class=qmax>/${owned}</span><button type=button class=plus>+</button></td>
     <td class=n>${ut}</td><td class="n rt">${fmt(u * q)}</td></tr>`;
 }
 
 function sectionsHtml(groups) {
   return groups.map(([fn, items]) =>
     `<section class="cat sec"><h3><span>${esc(fn)}</span><span class=sub>—</span></h3>
-     <table><tr><th>Rzecz</th><th class=q>Ilość</th><th class=n>/szt</th><th class=n>Razem</th></tr>
+     <table><tr><th>Rzecz</th><th class=q>Ilość</th><th class=n>g/szt</th><th class=n>Razem</th></tr>
      ${items.map(rowHtml).join("")}</table></section>`).join("");
 }
 
