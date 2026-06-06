@@ -157,7 +157,11 @@ function inPasmo(it) { return rank(it.p) <= rank(STATE.pasmo); }
 function trank(t) { return (DATA.temp_rank && DATA.temp_rank[t] != null) ? DATA.temp_rank[t] : 0; }
 function tempOK(it) { return it.temp == null || trank(it.temp) <= trank(STATE.temp); }
 function lodOK(it) { return !(STATE.lod === "nie" && it.lod); }
-function searchOK(it) { return !STATE.q || it.n.toLowerCase().includes(STATE.q.toLowerCase()); }
+function searchOK(it) {
+  if (!STATE.q) return true;
+  const q = STATE.q.toLowerCase();
+  return [it.n, it.k, it.pr, it.md].some(s => s && s.toLowerCase().includes(q));
+}
 
 function defQty(it) {
   if (it._apt) return 1;
