@@ -158,7 +158,7 @@ function searchOK(it) {
 
 function defQty(it) {
   if (it._apt) return 1;
-  if (it._excl) return 0;                 // odfiltrowane (pasmo/temp/śnieg/decyzja) → domyślnie 0
+  if (it._excl || it.roz) return 0;       // odfiltrowane / do rozważenia (nie mam) → domyślnie 0
   const t = currentTrip();
   if (t && t.ilosc && (it.n in t.ilosc)) return t.ilosc[it.n];
   return it.q;
@@ -174,6 +174,8 @@ function compute() {
   const out = [];
   DATA.items.forEach(it => {
     const forced = dodaj.has(it.n);
+    // „do rozważenia" (nie posiadam) — zawsze widoczne we własnej sekcji, ilość 0
+    if (it.roz && !forced) { out.push(Object.assign({}, it, { _r: "do rozważenia — nie mam", _excl: true })); return; }
     // powód odfiltrowania (jeśli jest) — pozycja pokaże się ZAWSZE, ale z ilością 0
     const r = forced ? null
       : usun.has(it.n) ? "decyzja: nie bierzemy"
@@ -196,10 +198,11 @@ function compute() {
   return out;
 }
 
+const ROZ_FUN = "🤔 Do rozważenia (nie mam)";
 function groupByFun(items) {
   const g = {};
-  items.forEach(it => (g[it.f] = g[it.f] || []).push(it));
-  return DATA.fun_order.filter(fn => g[fn])
+  items.forEach(it => { const fn = it.roz ? ROZ_FUN : it.f; (g[fn] = g[fn] || []).push(it); });
+  return DATA.fun_order.concat([ROZ_FUN]).filter(fn => g[fn])
     .map(fn => [fn, g[fn].sort((a, b) => a.n.localeCompare(b.n, "pl"))]);
 }
 
