@@ -53,6 +53,7 @@ function init() {
     const d = b.dataset.doc, i = d.indexOf(":"), kind = d.slice(0, i), keyv = d.slice(i + 1);
     if (kind === "g") openDoc(keyv, (DATA.przewodniki || {})[keyv]);
     else if (kind === "u") openDoc(keyv, (DATA.ulotki || {})[keyv]);
+    else if (kind === "d") openDoc("🌳 Drzewko — " + keyv, (DATA.drzewka || {})[keyv]);
   });
   $("#docClose").onclick = () => $("#docDlg").close();
   $("#docDlg").addEventListener("click", e => { if (e.target.id === "docDlg") $("#docDlg").close(); });
@@ -183,10 +184,13 @@ function srRow(s) {
   return `<div class=arow><div class=aname>${esc(s.n)}</div>
     <div class=ameta>${aptChips(s.apt)}</div></div>`;
 }
-function sections(groups, rowFn) {
-  return groups.map(([k, its]) =>
-    `<section class="cat sec"><h3><span>${esc(k)}</span><span class=sub>${its.length}</span></h3>
-     <div class=alist>${its.map(rowFn).join("")}</div></section>`).join("");
+function sections(groups, rowFn, withTree) {
+  return groups.map(([k, its]) => {
+    const tree = (withTree && DATA.drzewka && DATA.drzewka[k])
+      ? ` <button class="docbtn dtree" data-doc="d:${esc(k)}" title="Drzewko decyzyjne">🌳</button>` : "";
+    return `<section class="cat sec"><h3><span>${esc(k)}${tree}</span><span class=sub>${its.length}</span></h3>
+     <div class=alist>${its.map(rowFn).join("")}</div></section>`;
+  }).join("");
 }
 
 function render() {
@@ -201,7 +205,7 @@ function render() {
       L = L.filter(l => lekBucket(l) === STATE.loc);
     }
     n = L.length;
-    html = sections(group(L, l => l.d, DATA.dolegliwosci_order), lekRow);
+    html = sections(group(L, l => l.d, DATA.dolegliwosci_order), lekRow, true);
   } else {
     const S = (DATA.srodki || []).filter(s => matchApt(s.apt) && searchSr(s));
     n = S.length;

@@ -185,6 +185,9 @@ dialog h3 { margin: 0 0 6px; font-size: 15px; }
 .guides { display: flex; flex-wrap: wrap; gap: 6px; }
 .guides .docbtn { font-size: 12px; }
 .ibtn { font-size: 13px; padding: 0 4px; border: none; background: none; cursor: pointer; vertical-align: middle; }
+.cat h3 .dtree { font-size: 13px; padding: 0 4px; border: none; background: none; cursor: pointer;
+                 line-height: 1; vertical-align: middle; }
+.cat h3 .dtree:hover { transform: scale(1.15); }
 .badge.roz { background: #eef0ff; color: #4a4ab4; }
 #docDlg { border: none; border-radius: 12px; padding: 0; max-width: min(720px, 94vw); width: 720px; }
 #docDlg::backdrop { background: rgba(0,0,0,.45); }
