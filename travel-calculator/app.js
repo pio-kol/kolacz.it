@@ -157,10 +157,13 @@ function inPasmo(it) { return rank(it.p) <= rank(STATE.pasmo); }
 function trank(t) { return (DATA.temp_rank && DATA.temp_rank[t] != null) ? DATA.temp_rank[t] : 0; }
 function tempOK(it) { return it.temp == null || trank(it.temp) <= trank(STATE.temp); }
 function lodOK(it) { return !(STATE.lod === "nie" && it.lod); }
+function dePL(s) {
+  return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
+}
 function searchOK(it) {
   if (!STATE.q) return true;
-  const q = STATE.q.toLowerCase();
-  return [it.n, it.k, it.pr, it.md].some(s => s && s.toLowerCase().includes(q));
+  const q = dePL(STATE.q);
+  return [it.n, it.k, it.pr, it.md].some(s => s && dePL(s).includes(q));
 }
 
 function defQty(it) {
