@@ -71,11 +71,11 @@ const aptChips = (apt) => (apt || []).map(c => `<span class=aptchip>${esc(aptNam
 const matchApt = (apt) => !STATE.apt || (apt || []).includes(STATE.apt);
 // lokalizacja leku: do kupienia > konkretny pojemnik (apteczka/organizer) > w domu
 function lekBucket(l) {
-  if (l.kup) return "kup";
+  if (l.kup) return "kup";                 // do kupienia (zdecydowane) — nie ma w apteczce
+  if (l.roz) return "rozw";                // do rozważenia (rozważam zakup) — też nie w apteczce
   const apt = l.apt || [];
   if (apt.includes("mountain_leader_pro")) return "mlp";
   if (apt.includes("forclaz")) return "forclaz";
-  if (apt.includes("do_rozwazenia")) return "dorozw";
   if (apt.includes("solognac_czarny")) return "sol-czarny";
   if (apt.includes("solognac_zielony")) return "sol-zielony";
   if (apt.includes("solognac")) return "sol";
@@ -83,7 +83,7 @@ function lekBucket(l) {
 }
 function searchLek(l) {
   const q = dePL(STATE.q); if (!q) return true;
-  const extra = l.kup ? "do kupienia kupic" : "";
+  const extra = (l.kup ? "do kupienia kupic " : "") + (l.roz ? "do rozwazenia rozwazam" : "");
   return [l.n, l.na, l.d, l.f, l.s, l.syt, extra].some(x => x && dePL(x).includes(q));
 }
 function searchSr(s) {
@@ -126,7 +126,7 @@ function render() {
     if (STATE.rx === "rx") L = L.filter(l => l.rx);
     else if (STATE.rx === "otc") L = L.filter(l => !l.rx);
     if (STATE.loc === "mam") {            // domyślnie: tylko posiadane (bez do kupienia / do rozważenia)
-      L = L.filter(l => { const b = lekBucket(l); return b !== "kup" && b !== "dorozw"; });
+      L = L.filter(l => { const b = lekBucket(l); return b !== "kup" && b !== "rozw"; });
     } else if (STATE.loc !== "all") {
       L = L.filter(l => lekBucket(l) === STATE.loc);
     }
