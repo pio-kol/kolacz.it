@@ -170,6 +170,8 @@ function qtyOf(it) { return (it.n in STATE.qty) ? STATE.qty[it.n] : defQty(it); 
 
 function compute() {
   const t = currentTrip();
+  // szukanie globalne: wpisany tekst ignoruje filtry (tag/pasmo/temp/lód)
+  if (STATE.q) return { main: DATA.items.filter(searchOK), excl: [] };
   const dodaj = new Set(t ? t.dodaj : []);
   const usun = new Set(t ? t.usun : []);
   const main = [], excl = [];
@@ -229,14 +231,18 @@ function sectionsHtml(groups) {
 function render() {
   syncChips();
   const t = currentTrip();
-  $("#celinfo").innerHTML = t
+  $("#celinfo").innerHTML = STATE.q
+    ? `<span class=powod>szukanie „${esc(STATE.q)}" — filtry pominięte</span>`
+    : t
     ? `<b>${esc(t.nazwa)}</b> · cel: ${esc(t.cel || "—")} · ${esc(t.uwagi || "").slice(0, 160)}`
     : (STATE.tags.size ? "" : "Wybierz aktywność (chipy) lub preset wyjazdu.");
 
   const { main, excl } = compute();
   const app = $("#app");
   if (!main.length && !excl.length) {
-    app.innerHTML = "<p class=empty>Brak rzeczy dla tych filtrów. Zaznacz aktywność lub poszerz pasmo.</p>";
+    app.innerHTML = STATE.q
+      ? `<p class=empty>Brak rzeczy pasujących do „${esc(STATE.q)}".</p>`
+      : "<p class=empty>Brak rzeczy dla tych filtrów. Zaznacz aktywność lub poszerz pasmo.</p>";
     recompute(); return;
   }
   let html = `<div class=cats id=main-sections>${sectionsHtml(groupByFun(main))}</div>`;
