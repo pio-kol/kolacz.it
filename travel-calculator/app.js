@@ -92,8 +92,7 @@ function init() {
   window.addEventListener("scroll", () => {
     const y = window.scrollY || 0;
     if (y > lastY + 6 && y > 120) setFilters(false);   // scroll w dół → schowaj
-    else if (y <= 4) setFilters(true);                 // dopiero na samej górze listy → pokaż
-    lastY = y;
+    lastY = y;                                         // otwieranie WYŁĄCZNIE ręcznie (przycisk Filtry)
   }, { passive: true });
 
   // iOS: trzymaj dolny dok (suma + szukajka) NAD klawiaturą, nie za nią
