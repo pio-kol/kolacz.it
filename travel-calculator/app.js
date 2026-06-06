@@ -21,12 +21,12 @@ const fmt = (g) => !g ? "—" : (g >= 1000 ? (g / 1000).toFixed(2) + " kg" : g +
 const rank = (p) => (DATA.pasmo_rank[p] != null ? DATA.pasmo_rank[p] : 0);
 
 // ---------- inicjalizacja ----------
-fetch("data.json").then(r => r.json()).then(d => { DATA = d; init(); })
+fetch("data.json", { cache: "no-cache" }).then(r => r.json()).then(d => { DATA = d; init(); })
   .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });
 
 function init() {
   $("#meta").textContent =
-    `baza: ${DATA.items.length} rzeczy · ${DATA.wyjazdy.length} wyjazdów · zaktualizowano ${DATA.generated}`;
+    `baza: ${DATA.items.length} rzeczy · ${DATA.wyjazdy.length} wyjazdów · wersja ${DATA.commit || DATA.generated}`;
 
   // presety wyjazdów
   const trip = $("#trip");

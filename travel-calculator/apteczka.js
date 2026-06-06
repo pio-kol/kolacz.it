@@ -18,7 +18,7 @@ const aptName = (code) => (DATA.apt_nazwy && DATA.apt_nazwy[code]) || APT_FALLBA
 function init() {
   const leki = DATA.leki || [], srodki = DATA.srodki || [];
   $("#meta").textContent =
-    `${leki.length} leków · ${srodki.length} środków · zaktualizowano ${DATA.generated}`;
+    `${leki.length} leków · ${srodki.length} środków · wersja ${DATA.commit || DATA.generated}`;
 
   // apteczki do filtra: wszystkie kody występujące w lekach/środkach
   const codes = new Set();
@@ -150,5 +150,5 @@ function render() {
 }
 
 // ---------- bootstrap (na końcu: po deklaracjach const) ----------
-fetch("data.json").then(r => r.json()).then(d => { DATA = d; init(); })
+fetch("data.json", { cache: "no-cache" }).then(r => r.json()).then(d => { DATA = d; init(); })
   .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });

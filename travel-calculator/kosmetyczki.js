@@ -18,7 +18,7 @@ function init() {
   const order = (DATA.kosmetyczki_order || Object.keys(K));
   const total = order.reduce((s, c) => s + ((K[c] && K[c].items || []).length), 0);
   $("#meta").textContent =
-    `${order.length} kosmetyczki · ${total} pozycji · zaktualizowano ${DATA.generated}`;
+    `${order.length} kosmetyczki · ${total} pozycji · wersja ${DATA.commit || DATA.generated}`;
 
   $("#kosmFilter").innerHTML = '<option value="">— wszystkie —</option>' +
     order.map(c => `<option value="${esc(c)}">${esc((K[c] || {}).n || c)}</option>`).join("");
@@ -107,5 +107,5 @@ function recompute() {
 }
 
 // ---------- bootstrap (na końcu: po deklaracjach const) ----------
-fetch("data.json").then(r => r.json()).then(d => { DATA = d; init(); })
+fetch("data.json", { cache: "no-cache" }).then(r => r.json()).then(d => { DATA = d; init(); })
   .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });
