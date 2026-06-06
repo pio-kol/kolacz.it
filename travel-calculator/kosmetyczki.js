@@ -60,10 +60,6 @@ function render() {
   $(".gramval").textContent = fmt(gAll);
 }
 
-// ---------- bootstrap (na końcu: po deklaracjach const, by działało w standalone) ----------
-if (window.PAKDATA) {
-  DATA = window.PAKDATA; init();
-} else {
-  fetch("data.json").then(r => r.json()).then(d => { DATA = d; init(); })
-    .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });
-}
+// ---------- bootstrap (na końcu: po deklaracjach const) ----------
+fetch("data.json").then(r => r.json()).then(d => { DATA = d; init(); })
+  .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });

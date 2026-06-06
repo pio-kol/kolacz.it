@@ -22,12 +22,8 @@ const fmt = (g) => !g ? "—" : (g >= 1000 ? (g / 1000).toFixed(2) + " kg" : g +
 const rank = (p) => (DATA.pasmo_rank[p] != null ? DATA.pasmo_rank[p] : 0);
 
 // ---------- inicjalizacja ----------
-if (window.PAKDATA) {                       // tryb standalone (dane wbudowane)
-  DATA = window.PAKDATA; init();
-} else {                                    // tryb Pages (data.json obok)
-  fetch("data.json").then(r => r.json()).then(d => { DATA = d; init(); })
-    .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });
-}
+fetch("data.json").then(r => r.json()).then(d => { DATA = d; init(); })
+  .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });
 
 function init() {
   $("#meta").textContent =

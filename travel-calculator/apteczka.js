@@ -118,10 +118,6 @@ function render() {
   $(".grandval").textContent = n;
 }
 
-// ---------- bootstrap (na końcu: po deklaracjach const, by działało w standalone) ----------
-if (window.PAKDATA) {                        // standalone (dane wbudowane)
-  DATA = window.PAKDATA; init();
-} else {                                     // GitHub Pages (data.json obok)
-  fetch("data.json").then(r => r.json()).then(d => { DATA = d; init(); })
-    .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });
-}
+// ---------- bootstrap (na końcu: po deklaracjach const) ----------
+fetch("data.json").then(r => r.json()).then(d => { DATA = d; init(); })
+  .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });
