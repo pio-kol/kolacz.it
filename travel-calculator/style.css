@@ -101,6 +101,42 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 
 .empty { color: #889; padding: 24px 4px; text-align: center; }
 
+/* ---- nawigacja między stronami (Pakowanie / Apteczka) ---- */
+.pagenav { display: flex; gap: 6px; flex: 1; justify-content: center; }
+.navlink {
+  font-size: 12px; font-weight: 600; text-decoration: none; color: #44505e;
+  padding: 5px 11px; border: 1px solid #c4c9d0; border-radius: 999px; background: #fff;
+  white-space: nowrap;
+}
+.navlink.on { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+
+/* ---- zakładki (apteczka: leki / środki) ---- */
+.tabs { display: flex; gap: 6px; width: 100%; }
+.tab {
+  flex: 1; font: inherit; font-size: 13px; font-weight: 600; padding: 9px 8px;
+  border: 1px solid #c4c9d0; border-radius: 8px; background: #fff; cursor: pointer;
+}
+.tab.on { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+
+/* ---- listy leków / środków ---- */
+.alist { display: block; }
+.arow { padding: 8px 10px; border-bottom: 1px solid #f0f2f5; }
+.arow:last-child { border-bottom: none; }
+.aname { font-weight: 600; overflow-wrap: anywhere; }
+.sub2 { font-weight: 400; color: #667; font-size: 12px; }
+.ameta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 4px; }
+.forma { font-size: 11px; color: #778; }
+.badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px;
+         vertical-align: middle; margin-left: 5px; }
+.badge.rx { background: #fde2e2; color: #b4241f; }
+.waz { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: #eef1f5; color: #556; }
+.waz.ok { background: #e3f5ea; color: #138a4e; }
+.waz.warn { background: #fdf0d8; color: #9a6a00; }
+.waz.bad { background: #fde2e2; color: #b4241f; font-weight: 700; }
+.aptchip { font-size: 10.5px; padding: 1px 8px; border-radius: 999px;
+           background: #eaf1fd; color: #1f5fbf; border: 1px solid #d6e3fb; white-space: nowrap; }
+@media screen and (min-width: 560px) { .pagenav { justify-content: flex-start; } }
+
 dialog { border: none; border-radius: 10px; padding: 16px; max-width: 92vw; width: 560px; }
 dialog h3 { margin: 0 0 6px; font-size: 15px; }
 .small { font-size: 12px; color: #667; margin: 0 0 8px; }

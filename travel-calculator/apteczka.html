@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang=pl>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>💊 Apteczka — leki i środki</title>
+<link rel=stylesheet href="style.css">
+</head>
+<body class=aptpage>
+<section id=controls>
+  <div class=ctlhead>
+    <b class=brand>💊 Apteczka</b>
+    <nav class=pagenav>
+      <a class=navlink href="index.html">🎒 Pakowanie</a>
+      <a class="navlink on" href="apteczka.html">💊 Apteczka</a>
+    </nav>
+  </div>
+  <div id=ctlbody>
+  <div id=meta class=meta></div>
+  <div class=ctlrow>
+    <div id=tabs class=tabs>
+      <button class="tab on" data-tab=leki type=button>💊 Leki po dolegliwościach</button>
+      <button class=tab data-tab=srodki type=button>🩹 Środki wg kategorii</button>
+    </div>
+  </div>
+  <div class=ctlrow>
+    <label class=fld>Apteczka
+      <select id=aptFilter><option value="">— wszystkie —</option></select>
+    </label>
+    <label class=fld id=rxWrap>Recepta
+      <select id=rxFilter>
+        <option value=all>wszystkie</option>
+        <option value=rx>tylko Rx</option>
+        <option value=otc>bez recepty</option>
+      </select>
+    </label>
+  </div>
+  </div>
+</section>
+
+<main id=app></main>
+
+<div id=dock>
+  <div id=bar><span class=grandval>0</span> pozycji</div>
+  <input id=search type=search placeholder="🔍 Szukaj leku / środka / dolegliwości…" autocomplete=off>
+</div>
+
+<script src="apteczka.js"></script>
+</body>
+</html>

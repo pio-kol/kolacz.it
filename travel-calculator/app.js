@@ -196,10 +196,14 @@ function compute() {
       if (r) excl.push(Object.assign({}, it, { _r: r }));
     }
   });
-  if (t) {  // apteczki wyjazdu jako pozycje
+  if (t) {  // apteczki + kosmetyczki wyjazdu jako pojemniki-pozycje
     t.apteczki.forEach(code => {
       const a = DATA.apteczki[code];
-      if (a) main.push({ n: a.n, k: "Apteczka", f: "Apteczka", p: "niskie", w: a.w, q: 1, t: [], _apt: true });
+      if (a) main.push({ n: a.n, k: "Bezpieczeństwo", f: "Bezpieczeństwo", p: "niskie", w: a.w, q: 1, t: [], _apt: true });
+    });
+    (t.kosmetyczki || []).forEach(code => {
+      const k = (DATA.kosmetyczki || {})[code];
+      if (k) main.push({ n: k.n, k: "Kosmetyki", f: "Higiena", p: "niskie", w: k.w, q: 1, t: [], _apt: true });
     });
   }
   return { main, excl };
