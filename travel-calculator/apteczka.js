@@ -3,7 +3,7 @@
 "use strict";
 
 let DATA = null;
-const STATE = { tab: "leki", apt: "", rx: "all", kup: "all", q: "" };
+const STATE = { tab: "leki", apt: "", rx: "all", loc: "all", q: "" };
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -38,12 +38,12 @@ function init() {
     $$(".tab").forEach(t => t.classList.toggle("on", t === b));
     const lek = STATE.tab === "leki";
     $("#rxWrap").style.display = lek ? "" : "none";
-    $("#kupWrap").style.display = lek ? "" : "none";
+    $("#locWrap").style.display = lek ? "" : "none";
     render();
   };
   $("#aptFilter").onchange = e => { STATE.apt = e.target.value; render(); };
   $("#rxFilter").onchange = e => { STATE.rx = e.target.value; render(); };
-  $("#kupFilter").onchange = e => { STATE.kup = e.target.value; render(); };
+  $("#locFilter").onchange = e => { STATE.loc = e.target.value; render(); };
   let t;
   $("#search").oninput = e => {
     STATE.q = e.target.value.trim();
@@ -69,6 +69,11 @@ function wazBadge(waz) {
 const aptChips = (apt) => (apt || []).map(c => `<span class=aptchip>${esc(aptName(c))}</span>`).join("");
 
 const matchApt = (apt) => !STATE.apt || (apt || []).includes(STATE.apt);
+// lokalizacja leku: do kupienia > w apteczce (realny kit) > w domu (dom_tylko/brak)
+function lekLoc(l) {
+  if (l.kup) return "kup";
+  return (l.apt || []).some(a => a !== "dom_tylko") ? "apteczka" : "dom";
+}
 function searchLek(l) {
   const q = dePL(STATE.q); if (!q) return true;
   const extra = (l.kup ? "do kupienia kupic " : "") + (l.org ? "organizer " + l.org : "");
@@ -113,8 +118,7 @@ function render() {
     let L = (DATA.leki || []).filter(l => matchApt(l.apt) && searchLek(l));
     if (STATE.rx === "rx") L = L.filter(l => l.rx);
     else if (STATE.rx === "otc") L = L.filter(l => !l.rx);
-    if (STATE.kup === "kup") L = L.filter(l => l.kup);
-    else if (STATE.kup === "mam") L = L.filter(l => !l.kup);
+    if (STATE.loc !== "all") L = L.filter(l => lekLoc(l) === STATE.loc);
     n = L.length;
     html = sections(group(L, l => l.d, DATA.dolegliwosci_order), lekRow);
   } else {
