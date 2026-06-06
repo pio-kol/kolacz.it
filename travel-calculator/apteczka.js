@@ -3,7 +3,7 @@
 "use strict";
 
 let DATA = null;
-const STATE = { tab: "leki", apt: "", rx: "all", loc: "all", q: "" };
+const STATE = { tab: "leki", apt: "", rx: "all", loc: "mam", q: "" };
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -12,7 +12,7 @@ const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c =>
 const dePL = (s) => String(s || "").toLowerCase().normalize("NFD")
   .replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
 
-const APT_FALLBACK = { dom_tylko: "🏠 Dom (nie pakowane)" };
+const APT_FALLBACK = { dom_tylko: "🏠 Dom" };
 const aptName = (code) => (DATA.apt_nazwy && DATA.apt_nazwy[code]) || APT_FALLBACK[code] || code;
 
 function init() {
@@ -125,7 +125,11 @@ function render() {
     let L = (DATA.leki || []).filter(l => matchApt(l.apt) && searchLek(l));
     if (STATE.rx === "rx") L = L.filter(l => l.rx);
     else if (STATE.rx === "otc") L = L.filter(l => !l.rx);
-    if (STATE.loc !== "all") L = L.filter(l => lekBucket(l) === STATE.loc);
+    if (STATE.loc === "mam") {            // domyślnie: tylko posiadane (bez do kupienia / do rozważenia)
+      L = L.filter(l => { const b = lekBucket(l); return b !== "kup" && b !== "dorozw"; });
+    } else if (STATE.loc !== "all") {
+      L = L.filter(l => lekBucket(l) === STATE.loc);
+    }
     n = L.length;
     html = sections(group(L, l => l.d, DATA.dolegliwosci_order), lekRow);
   } else {
