@@ -10,7 +10,6 @@ const STATE = {
   lod: "dowolnie",       // dowolnie | tak | nie
   tags: new Set(),
   q: "",                 // szukajka
-  showExcluded: false,
   qty: {},               // nadpisania ilości: nazwa -> liczba
 };
 
@@ -70,11 +69,6 @@ function init() {
     const t = c.dataset.tag;
     STATE.tags.has(t) ? STATE.tags.delete(t) : STATE.tags.add(t);
     render();
-  };
-  $("#toggleEx").onclick = () => {
-    STATE.showExcluded = !STATE.showExcluded;
-    $("#excl-wrap").classList.toggle("hidden", !STATE.showExcluded);
-    $("#toggleEx").textContent = STATE.showExcluded ? "Ukryj odfiltrowane" : "Pokaż odfiltrowane";
   };
   // zwijanie panelu filtrów: przycisk + auto przy scrollu
   const body = $("#ctlbody"), ftog = $("#filtToggle");
@@ -164,6 +158,7 @@ function searchOK(it) {
 
 function defQty(it) {
   if (it._apt) return 1;
+  if (it._excl) return 0;                 // odfiltrowane (pasmo/temp/śnieg/decyzja) → domyślnie 0
   const t = currentTrip();
   if (t && t.ilosc && (it.n in t.ilosc)) return t.ilosc[it.n];
   return it.q;
@@ -173,36 +168,32 @@ function qtyOf(it) { return (it.n in STATE.qty) ? STATE.qty[it.n] : defQty(it); 
 function compute() {
   const t = currentTrip();
   // szukanie globalne: wpisany tekst ignoruje filtry (tag/pasmo/temp/lód)
-  if (STATE.q) return { main: DATA.items.filter(searchOK), excl: [] };
+  if (STATE.q) return DATA.items.filter(searchOK);
   const dodaj = new Set(t ? t.dodaj : []);
   const usun = new Set(t ? t.usun : []);
-  const main = [], excl = [];
+  const out = [];
   DATA.items.forEach(it => {
-    if (!searchOK(it)) return;
-    const tagged = matchTags(it);
+    if (!matchTags(it)) return;                       // tylko wybrane aktywności (chipy)
     const forced = dodaj.has(it.n);
-    const removed = usun.has(it.n);
-    const cand = forced || (tagged && inPasmo(it) && tempOK(it) && lodOK(it) && !removed);
-    if (cand) { main.push(it); return; }
-    if (tagged && searchOK(it)) {
-      let r = removed ? "decyzja: nie bierzemy"
-        : rank(it.p) > rank(STATE.pasmo) ? "pasmo " + it.p
-        : !tempOK(it) ? "cieplej niż " + STATE.temp.replace("_", " ")
-        : (STATE.lod === "nie" && it.lod) ? "tylko na śniegu/lodzie" : null;
-      if (r) excl.push(Object.assign({}, it, { _r: r }));
-    }
+    // powód odfiltrowania (jeśli jest) — pozycja pokaże się, ale z ilością 0
+    const r = forced ? null
+      : usun.has(it.n) ? "decyzja: nie bierzemy"
+      : rank(it.p) > rank(STATE.pasmo) ? "pasmo " + it.p
+      : !tempOK(it) ? "cieplej niż " + STATE.temp.replace("_", " ")
+      : (STATE.lod === "nie" && it.lod) ? "tylko na śniegu/lodzie" : null;
+    out.push(r ? Object.assign({}, it, { _r: r, _excl: true }) : it);
   });
   if (t) {  // apteczki + kosmetyczki wyjazdu jako pojemniki-pozycje
     t.apteczki.forEach(code => {
       const a = DATA.apteczki[code];
-      if (a) main.push({ n: a.n, k: "Bezpieczeństwo", f: "Bezpieczeństwo", p: "niskie", w: a.w, q: 1, t: [], _apt: true });
+      if (a) out.push({ n: a.n, k: "Bezpieczeństwo", f: "Bezpieczeństwo", p: "niskie", w: a.w, q: 1, t: [], _apt: true });
     });
     (t.kosmetyczki || []).forEach(code => {
       const k = (DATA.kosmetyczki || {})[code];
-      if (k) main.push({ n: k.n, k: "Kosmetyki", f: "Higiena", p: "niskie", w: k.w, q: 1, t: [], _apt: true });
+      if (k) out.push({ n: k.n, k: "Kosmetyki", f: "Higiena", p: "niskie", w: k.w, q: 1, t: [], _apt: true });
     });
   }
-  return { main, excl };
+  return out;
 }
 
 function groupByFun(items) {
@@ -220,7 +211,7 @@ function rowHtml(it) {
   const ut = u ? u + " g" : "—";
   const uw = it.u ? ` <span class=uwg title="${esc(it.u)}">ⓘ</span>` : "";
   const pw = it._r ? ` <span class=powod>(${esc(it._r)})</span>` : "";
-  return `<tr class="row${q === 0 ? " off" : ""}" data-name="${esc(it.n)}" data-w="${u}" data-max="${owned}"${it._apt ? " data-apt=1" : ""}>
+  return `<tr class="row${q === 0 ? " off" : ""}" data-name="${esc(it.n)}" data-w="${u}" data-max="${owned}" data-def="${defQty(it)}"${it._apt ? " data-apt=1" : ""}${it._excl ? " data-excl=1" : ""}>
     <td>${esc(it.n)}${uw}${pw}</td>
     <td class=qtycell><button type=button class=minus>−</button>
       <span class=qv>${q}</span><button type=button class=plus>+</button></td>
@@ -243,20 +234,15 @@ function render() {
     ? `<b>${esc(t.nazwa)}</b> · cel: ${esc(t.cel || "—")} · ${esc(t.uwagi || "").slice(0, 160)}`
     : (STATE.tags.size ? "" : "Wybierz aktywność (chipy) lub preset wyjazdu.");
 
-  const { main, excl } = compute();
+  const items = compute();
   const app = $("#app");
-  if (!main.length && !excl.length) {
+  if (!items.length) {
     app.innerHTML = STATE.q
       ? `<p class=empty>Brak rzeczy pasujących do „${esc(STATE.q)}".</p>`
       : "<p class=empty>Brak rzeczy dla tych filtrów. Zaznacz aktywność lub poszerz pasmo.</p>";
     recompute(); return;
   }
-  let html = `<div class=cats id=main-sections>${sectionsHtml(groupByFun(main))}</div>`;
-  html += `<div id=excl-wrap class="${STATE.showExcluded ? "" : "hidden"}">
-    <div class=exhdr>➕ Odfiltrowane (${excl.length}) — ustaw ilość &gt; 0, by dodać</div>
-    <div class=exnote>Pasują do aktywności, ale ucięte przez pasmo/śnieg lub świadomie pominięte.</div>
-    <div class=cats id=excl-sections>${sectionsHtml(groupByFun(excl))}</div></div>`;
-  app.innerHTML = html;
+  app.innerHTML = `<div class=cats id=main-sections>${sectionsHtml(groupByFun(items))}</div>`;
   recompute();
 }
 
@@ -329,14 +315,13 @@ function exportYaml() {
     if (r.dataset.apt === "1") return;
     const name = r.dataset.name;
     const q = parseInt(r.querySelector(".qv").textContent, 10) || 0;
-    const def = defQtyByName(name);
-    if (q === 0) usun.push(name);
-    else if (q !== def) ilosc.push([name, q]);
-  });
-  $$("#excl-sections .row").forEach(r => {
-    const name = r.dataset.name;
-    const q = parseInt(r.querySelector(".qv").textContent, 10) || 0;
-    if (q > 0) { dodaj.push(name); if (q !== 1) ilosc.push([name, q]); }
+    const def = +r.dataset.def || 0;
+    if (r.dataset.excl === "1") {            // odfiltrowane: domyślnie 0 → q>0 znaczy „dodaj"
+      if (q > 0) { dodaj.push(name); if (q !== 1) ilosc.push([name, q]); }
+    } else {
+      if (q === 0) usun.push(name);
+      else if (q !== def) ilosc.push([name, q]);
+    }
   });
   const Q = (s) => JSON.stringify(s);
   let out = [];
@@ -350,8 +335,4 @@ function exportYaml() {
     ? out.join("\n")
     : "# Brak zmian względem domyślnych ilości.";
   $("#exportDlg").showModal();
-}
-function defQtyByName(name) {
-  const it = DATA.items.find(x => x.n === name);
-  return it ? defQty(it) : 1;
 }
