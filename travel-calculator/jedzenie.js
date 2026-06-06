@@ -29,7 +29,7 @@ function classify(name) {
 }
 
 function foodItems() {
-  return (DATA.items || []).filter(i => i.k === "Jedzenie");
+  return DATA.jedzenie || [];
 }
 
 function init() {
