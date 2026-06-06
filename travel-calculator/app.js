@@ -80,7 +80,7 @@ function init() {
   const body = $("#ctlbody"), ftog = $("#filtToggle");
   const setFilters = (open) => {
     body.classList.toggle("collapsed", !open);
-    ftog.textContent = open ? "Filtry ▴" : "Filtry ▾";
+    ftog.textContent = open ? "▴" : "▾";
     ftog.setAttribute("aria-expanded", open);
   };
   ftog.onclick = () => setFilters(body.classList.contains("collapsed"));
