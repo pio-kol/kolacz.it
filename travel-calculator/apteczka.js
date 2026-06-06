@@ -82,7 +82,7 @@ function lekBucket(l) {
 function searchLek(l) {
   const q = dePL(STATE.q); if (!q) return true;
   const extra = (l.kup ? "do kupienia kupic " : "") + (l.org ? "organizer " + l.org : "");
-  return [l.n, l.na, l.d, l.f, l.s, extra].some(x => x && dePL(x).includes(q));
+  return [l.n, l.na, l.d, l.f, l.s, l.syt, extra].some(x => x && dePL(x).includes(q));
 }
 function searchSr(s) {
   const q = dePL(STATE.q); if (!q) return true;
@@ -104,8 +104,9 @@ function lekRow(l) {
   const na = l.na ? ` <span class=sub2>${esc(l.na)}</span>` : "";
   const f = l.f ? `<span class=forma>${esc(l.f)}</span>` : "";
   const org = l.org ? `<span class="org org-${esc(l.org)}">🗂 ${esc(l.org)}</span>` : "";
+  const syt = l.syt ? `<div class=syt>📍 ${esc(l.syt)}</div>` : "";
   return `<div class="arow${l.kup ? " tobuy" : ""}"><div class=aname>${esc(l.n)}${rx}${kup}${na}</div>
-    <div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}${org}</div></div>`;
+    ${syt}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}${org}</div></div>`;
 }
 function srRow(s) {
   return `<div class=arow><div class=aname>${esc(s.n)}</div>
