@@ -54,8 +54,8 @@ function init() {
     `<option value="${t}" title="${esc(tlab[t] || "")}">${t.replace("_", " ")}</option>`).join("");
   $("#temp").value = STATE.temp;
 
-  // chipy aktywności
-  const tg = DATA.tagi_aktywnosci;
+  // chipy: wszystkie tagi (aktywności + kontekst) — do filtrowania i porządkowania danych
+  const tg = Object.assign({}, DATA.tagi_aktywnosci, DATA.tagi_kontekst || {});
   $("#tags").innerHTML = Object.keys(tg).map(t =>
     `<span class=chip data-tag="${t}" title="${esc(tg[t])}">${t}</span>`).join("");
 
