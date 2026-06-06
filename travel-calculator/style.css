@@ -61,7 +61,7 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .cat tr:last-child td { border-bottom: none; }
 .n { text-align: right; white-space: nowrap; }
 .cat th.n, .cat td.n { width: 56px; }
-.cat th.q, .qtycell { width: 126px; white-space: nowrap; text-align: center; }
+.cat th.q, .qtycell { width: 104px; white-space: nowrap; text-align: center; }
 .uwg { color: #8a93a0; cursor: help; }
 .minus, .plus {
   width: 30px; height: 30px; line-height: 1; padding: 0; font-size: 19px;
@@ -72,7 +72,6 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .minus:disabled, .plus:disabled { opacity: .3; cursor: default; }
 .qv { display: inline-block; min-width: 26px; text-align: center; font-weight: 700;
       font-variant-numeric: tabular-nums; }
-.mx { color: #9aa3ad; font-size: 11px; margin-left: 2px; }
 .row.off td { opacity: .4; }
 .row.off .qtycell { opacity: 1; }
 .powod { color: #b4451f; font-size: 11px; }

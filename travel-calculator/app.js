@@ -78,7 +78,7 @@ function init() {
   window.addEventListener("scroll", () => {
     const y = window.scrollY || 0;
     if (y > lastY + 6 && y > 120) setFilters(false);   // scroll w dół → schowaj
-    else if (y < lastY - 6) setFilters(true);          // scroll w górę → pokaż
+    else if (y <= 4) setFilters(true);                 // dopiero na samej górze listy → pokaż
     lastY = y;
   }, { passive: true });
 
@@ -182,8 +182,7 @@ function rowHtml(it) {
   return `<tr class="row${q === 0 ? " off" : ""}" data-name="${esc(it.n)}" data-w="${u}" data-max="${owned}"${it._apt ? " data-apt=1" : ""}>
     <td>${esc(it.n)}${uw}${pw}</td>
     <td class=qtycell><button type=button class=minus>−</button>
-      <span class=qv>${q}</span><button type=button class=plus title="masz ${owned} szt.">+</button>
-      <span class=mx>/${owned}</span></td>
+      <span class=qv>${q}</span><button type=button class=plus>+</button></td>
     <td class=n>${ut}</td><td class="n rt">${fmt(u * q)}</td></tr>`;
 }
 
