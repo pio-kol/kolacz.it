@@ -151,7 +151,7 @@ function lekBucket(l) {
 function searchLek(l) {
   const q = dePL(STATE.q); if (!q) return true;
   const extra = (l.kup ? "do kupienia kupic " : "") + (l.roz ? "do rozwazenia rozwazam" : "");
-  return [l.n, l.na, l.d, l.f, l.s, l.syt, extra].some(x => x && dePL(x).includes(q));
+  return [l.n, l.na, l.d, l.f, l.s, extra].some(x => x && dePL(x).includes(q));
 }
 function searchSr(s) {
   const q = dePL(STATE.q); if (!q) return true;
@@ -173,11 +173,10 @@ function lekRow(l) {
   const rx = l.rx ? '<span class="badge rx">Rx</span>' : "";
   const kup = l.kup ? '<span class="badge kup">🛒 do kupienia</span>' : "";
   const roz = l.roz ? '<span class="badge roz">🤔 do rozważenia</span>' : "";
-  const na = l.na ? ` <span class=sub2>${esc(l.na)}</span>` : "";
   const f = l.f ? `<span class=forma>${esc(l.f)}</span>` : "";
-  const syt = l.syt ? `<div class=syt>📍 ${esc(l.syt)}</div>` : "";
-  return `<div class="arow${l.kup || l.roz ? " tobuy" : ""}"><div class=aname>${esc(l.n)}${inf}${rx}${kup}${roz}${na}</div>
-    ${syt}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}</div></div>`;
+  const opis = l.na ? `<div class=opis>${esc(l.na)}</div>` : "";
+  return `<div class="arow${l.kup || l.roz ? " tobuy" : ""}"><div class=aname>${esc(l.n)}${inf}${rx}${kup}${roz}</div>
+    ${opis}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}</div></div>`;
 }
 function srRow(s) {
   return `<div class=arow><div class=aname>${esc(s.n)}</div>
