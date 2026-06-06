@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang=pl>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>🧴 Kosmetyczki — zawartość</title>
+<link rel=stylesheet href="style.css">
+</head>
+<body class=aptpage>
+<section id=controls>
+  <div class=ctlhead>
+    <b class=brand>🧴 Kosmetyczki</b>
+    <nav class=pagenav>
+      <a class=navlink href="index.html">🎒 Pakowanie</a>
+      <a class=navlink href="apteczka.html">💊 Apteczka</a>
+      <a class="navlink on" href="kosmetyczki.html">🧴 Kosmetyczki</a>
+    </nav>
+  </div>
+  <div id=ctlbody>
+  <div id=meta class=meta></div>
+  <div class=ctlrow>
+    <label class=fld>Kosmetyczka
+      <select id=kosmFilter><option value="">— wszystkie —</option></select>
+    </label>
+  </div>
+  </div>
+</section>
+
+<main id=app></main>
+
+<div id=dock>
+  <div id=bar><span class=grandval>0</span> pozycji · <span class=gramval>0</span></div>
+  <input id=search type=search placeholder="🔍 Szukaj kosmetyku…" autocomplete=off>
+</div>
+
+<script src="kosmetyczki.js"></script>
+</body>
+</html>
