@@ -273,7 +273,7 @@ function buildChecklist() {
   const title = t ? esc(t.nazwa) : "Lista pakowania";
   cont.innerHTML =
     `<div class=cl-head><h2>${title}</h2>` +
-    `<div class=cl-meta>Σ ${(total / 1000).toFixed(2)} kg · ${cnt} szt · ${DATA.generated}</div></div>` +
+    `<div class=cl-meta>${(total / 1000).toFixed(2)} kg · ${cnt} szt · ${DATA.generated}</div></div>` +
     `<div class=cl-cols>${secHtml || "<p>Brak rzeczy do spakowania.</p>"}</div>`;
 }
 
