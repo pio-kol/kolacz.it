@@ -64,7 +64,11 @@ function init() {
   $("#pasmo").onchange = e => { STATE.pasmo = e.target.value; render(); };
   $("#temp").onchange = e => { STATE.temp = e.target.value; render(); };
   $("#lod").onchange = e => { STATE.lod = e.target.value; render(); };
-  $("#search").oninput = e => { STATE.q = e.target.value.trim(); render(); };
+  let searchT;
+  $("#search").oninput = e => {
+    STATE.q = e.target.value.trim();
+    clearTimeout(searchT); searchT = setTimeout(render, 120);
+  };
   $("#tags").onclick = e => {
     const c = e.target.closest(".chip"); if (!c) return;
     const t = c.dataset.tag;
@@ -91,6 +95,20 @@ function init() {
     else if (y <= 4) setFilters(true);                 // dopiero na samej górze listy → pokaż
     lastY = y;
   }, { passive: true });
+
+  // iOS: trzymaj dolny dok (suma + szukajka) NAD klawiaturą, nie za nią
+  const vv = window.visualViewport;
+  if (vv) {
+    const dock = $("#dock");
+    const liftDock = () => {
+      const overlap = window.innerHeight - vv.height - vv.offsetTop;
+      dock.style.transform = overlap > 1 ? `translateY(${-overlap}px)` : "";
+    };
+    vv.addEventListener("resize", liftDock);
+    vv.addEventListener("scroll", liftDock);
+    $("#search").addEventListener("focus", () => setTimeout(liftDock, 50));
+    $("#search").addEventListener("blur", () => { dock.style.transform = ""; });
+  }
 
   $("#printBtn").onclick = () => { buildChecklist(); window.print(); };
   $("#resetBtn").onclick = () => { STATE.qty = {}; save(); render(); };
