@@ -69,10 +69,15 @@ function wazBadge(waz) {
 const aptChips = (apt) => (apt || []).map(c => `<span class=aptchip>${esc(aptName(c))}</span>`).join("");
 
 const matchApt = (apt) => !STATE.apt || (apt || []).includes(STATE.apt);
-// lokalizacja leku: do kupienia > w apteczce (realny kit) > w domu (dom_tylko/brak)
-function lekLoc(l) {
+// lokalizacja leku: do kupienia > konkretny pojemnik (apteczka/organizer) > w domu
+function lekBucket(l) {
   if (l.kup) return "kup";
-  return (l.apt || []).some(a => a !== "dom_tylko") ? "apteczka" : "dom";
+  const apt = l.apt || [];
+  if (apt.includes("mountain_leader_pro")) return "mlp";
+  if (apt.includes("forclaz")) return "forclaz";
+  if (apt.includes("do_rozwazenia")) return "dorozw";
+  if (apt.includes("solognac")) return "sol-" + (l.org || "luzem");
+  return "dom";
 }
 function searchLek(l) {
   const q = dePL(STATE.q); if (!q) return true;
@@ -118,7 +123,7 @@ function render() {
     let L = (DATA.leki || []).filter(l => matchApt(l.apt) && searchLek(l));
     if (STATE.rx === "rx") L = L.filter(l => l.rx);
     else if (STATE.rx === "otc") L = L.filter(l => !l.rx);
-    if (STATE.loc !== "all") L = L.filter(l => lekLoc(l) === STATE.loc);
+    if (STATE.loc !== "all") L = L.filter(l => lekBucket(l) === STATE.loc);
     n = L.length;
     html = sections(group(L, l => l.d, DATA.dolegliwosci_order), lekRow);
   } else {
