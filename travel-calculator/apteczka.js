@@ -76,12 +76,14 @@ function lekBucket(l) {
   if (apt.includes("mountain_leader_pro")) return "mlp";
   if (apt.includes("forclaz")) return "forclaz";
   if (apt.includes("do_rozwazenia")) return "dorozw";
-  if (apt.includes("solognac")) return "sol-" + (l.org || "luzem");
+  if (apt.includes("solognac_czarny")) return "sol-czarny";
+  if (apt.includes("solognac_zielony")) return "sol-zielony";
+  if (apt.includes("solognac")) return "sol";
   return "dom";
 }
 function searchLek(l) {
   const q = dePL(STATE.q); if (!q) return true;
-  const extra = (l.kup ? "do kupienia kupic " : "") + (l.org ? "organizer " + l.org : "");
+  const extra = l.kup ? "do kupienia kupic" : "";
   return [l.n, l.na, l.d, l.f, l.s, l.syt, extra].some(x => x && dePL(x).includes(q));
 }
 function searchSr(s) {
@@ -103,10 +105,9 @@ function lekRow(l) {
   const kup = l.kup ? '<span class="badge kup">🛒 do kupienia</span>' : "";
   const na = l.na ? ` <span class=sub2>${esc(l.na)}</span>` : "";
   const f = l.f ? `<span class=forma>${esc(l.f)}</span>` : "";
-  const org = l.org ? `<span class="org org-${esc(l.org)}">🗂 ${esc(l.org)}</span>` : "";
   const syt = l.syt ? `<div class=syt>📍 ${esc(l.syt)}</div>` : "";
   return `<div class="arow${l.kup ? " tobuy" : ""}"><div class=aname>${esc(l.n)}${rx}${kup}${na}</div>
-    ${syt}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}${org}</div></div>`;
+    ${syt}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}</div></div>`;
 }
 function srRow(s) {
   return `<div class=arow><div class=aname>${esc(s.n)}</div>
