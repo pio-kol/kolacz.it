@@ -4,7 +4,7 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <title>💊 Apteczka — leki i środki</title>
-<link rel=stylesheet href="style.css?v=c4d78cdb">
+<link rel=stylesheet href="style.css?v=778d05f3">
 </head>
 <body class=aptpage>
 <section id=controls>
@@ -23,6 +23,7 @@
       <button class=tab data-tab=srodki type=button>🩹 Środki wg kategorii</button>
     </div>
   </div>
+  <div class=ctlrow><div id=guides class=guides></div></div>
   <div class=ctlrow>
     <label class=fld id=aptWrap>Apteczka
       <select id=aptFilter><option value="">— wszystkie —</option></select>
@@ -59,6 +60,11 @@
   <input id=search type=search placeholder="🔍 Szukaj leku / środka / dolegliwości…" autocomplete=off>
 </div>
 
-<script src="apteczka.js?v=3b6492a8"></script>
+<dialog id=docDlg>
+  <div class=docbar><b id=docTitle></b><button id=docClose class=btn type=button>✕ Zamknij</button></div>
+  <div id=docBody class=md></div>
+</dialog>
+
+<script src="apteczka.js?v=05752817"></script>
 </body>
 </html>

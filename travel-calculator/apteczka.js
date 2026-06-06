@@ -44,7 +44,66 @@ function init() {
     STATE.q = e.target.value.trim();
     clearTimeout(t); t = setTimeout(render, 120);
   };
+  // przewodniki (drzewka decyzyjne, interakcje) — przyciski + modal
+  const guides = DATA.przewodniki || {};
+  $("#guides").innerHTML = Object.keys(guides)
+    .map(tytul => `<button class="btn docbtn" data-doc="g:${esc(tytul)}">${esc(tytul)}</button>`).join("");
+  document.addEventListener("click", e => {
+    const b = e.target.closest(".docbtn"); if (!b) return;
+    const d = b.dataset.doc, i = d.indexOf(":"), kind = d.slice(0, i), keyv = d.slice(i + 1);
+    if (kind === "g") openDoc(keyv, (DATA.przewodniki || {})[keyv]);
+    else if (kind === "u") openDoc(keyv, (DATA.ulotki || {})[keyv]);
+  });
+  $("#docClose").onclick = () => $("#docDlg").close();
+  $("#docDlg").addEventListener("click", e => { if (e.target.id === "docDlg") $("#docDlg").close(); });
   setTab(STATE.tab);
+}
+
+function openDoc(title, md) {
+  if (!md) return;
+  $("#docTitle").textContent = title;
+  $("#docBody").innerHTML = mdToHtml(md);
+  $("#docBody").scrollTop = 0;
+  $("#docDlg").showModal();
+}
+
+// minimalny renderer Markdown (nagłówki, **bold**, `code`, listy, ```blok```, tabele |, ---, > , linki)
+function mdToHtml(md) {
+  const e = s => s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  const inl = s => e(s)
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target=_blank rel=noopener>$1</a>');
+  let html = "", inCode = false, code = "", list = false, tbl = [];
+  const endL = () => { if (list) { html += "</ul>"; list = false; } };
+  const endT = () => {
+    if (!tbl.length) return;
+    html += "<table class=mdt>" + tbl.map((r, ri) => "<tr>" + r.map(c =>
+      `<${ri ? "td" : "th"}>${inl(c.trim())}</${ri ? "td" : "th"}>`).join("") + "</tr>").join("") + "</table>";
+    tbl = [];
+  };
+  for (const ln of md.split("\n")) {
+    if (ln.trim().startsWith("```")) {
+      if (inCode) { html += "<pre>" + e(code) + "</pre>"; code = ""; inCode = false; }
+      else { endL(); endT(); inCode = true; }
+      continue;
+    }
+    if (inCode) { code += ln + "\n"; continue; }
+    if (/^\s*\|/.test(ln)) {
+      if (/^[\s:|-]+$/.test(ln)) continue;            // wiersz separatora :-:
+      endL(); tbl.push(ln.trim().replace(/^\||\|$/g, "").split("|")); continue;
+    }
+    endT();
+    let m;
+    if ((m = ln.match(/^(#{1,6})\s+(.*)$/))) { endL(); const h = Math.min(m[1].length + 1, 5); html += `<h${h}>${inl(m[2])}</h${h}>`; }
+    else if (/^---+\s*$/.test(ln)) { endL(); html += "<hr>"; }
+    else if (/^\s*[-*]\s+/.test(ln)) { if (!list) { html += "<ul>"; list = true; } html += "<li>" + inl(ln.replace(/^\s*[-*]\s+/, "")) + "</li>"; }
+    else if (/^\s*>\s?/.test(ln)) { endL(); html += "<blockquote>" + inl(ln.replace(/^\s*>\s?/, "")) + "</blockquote>"; }
+    else if (ln.trim() === "") { endL(); }
+    else { endL(); html += "<p>" + inl(ln) + "</p>"; }
+  }
+  endL(); endT(); if (inCode) html += "<pre>" + e(code) + "</pre>";
+  return html;
 }
 
 // Filtr "Apteczka" tylko dla Środków; "Lokalizacja"/"Recepta" tylko dla Leków
@@ -109,12 +168,15 @@ function group(items, keyFn, order) {
 }
 
 function lekRow(l) {
+  const inf = (DATA.ulotki && DATA.ulotki[l.n])
+    ? ` <button class="docbtn ibtn" data-doc="u:${esc(l.n)}" title="Ulotka">📖</button>` : "";
   const rx = l.rx ? '<span class="badge rx">Rx</span>' : "";
   const kup = l.kup ? '<span class="badge kup">🛒 do kupienia</span>' : "";
+  const roz = l.roz ? '<span class="badge roz">🤔 do rozważenia</span>' : "";
   const na = l.na ? ` <span class=sub2>${esc(l.na)}</span>` : "";
   const f = l.f ? `<span class=forma>${esc(l.f)}</span>` : "";
   const syt = l.syt ? `<div class=syt>📍 ${esc(l.syt)}</div>` : "";
-  return `<div class="arow${l.kup ? " tobuy" : ""}"><div class=aname>${esc(l.n)}${rx}${kup}${na}</div>
+  return `<div class="arow${l.kup || l.roz ? " tobuy" : ""}"><div class=aname>${esc(l.n)}${inf}${rx}${kup}${roz}${na}</div>
     ${syt}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}</div></div>`;
 }
 function srRow(s) {

@@ -180,3 +180,30 @@ dialog h3 { margin: 0 0 6px; font-size: 15px; }
   .cl-q { font-weight: 700; color: #222; }
   .cl-w { color: #666; }
 }
+
+/* ---- przewodniki + ulotki (modal markdown) ---- */
+.guides { display: flex; flex-wrap: wrap; gap: 6px; }
+.guides .docbtn { font-size: 12px; }
+.ibtn { font-size: 13px; padding: 0 4px; border: none; background: none; cursor: pointer; vertical-align: middle; }
+.badge.roz { background: #eef0ff; color: #4a4ab4; }
+#docDlg { border: none; border-radius: 12px; padding: 0; max-width: min(720px, 94vw); width: 720px; }
+#docDlg::backdrop { background: rgba(0,0,0,.45); }
+.docbar { position: sticky; top: 0; background: #fff; display: flex; justify-content: space-between;
+          align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid #e6e9ee; }
+.docbar b { font-size: 15px; }
+.md { padding: 12px 18px 22px; overflow: auto; max-height: calc(88vh - 54px); line-height: 1.5; }
+.md h2 { font-size: 16px; margin: 14px 0 6px; }
+.md h3 { font-size: 14px; margin: 12px 0 5px; }
+.md h4 { font-size: 13px; margin: 10px 0 4px; color: #445; }
+.md p { margin: 6px 0; }
+.md ul { margin: 6px 0 6px 2px; padding-left: 18px; }
+.md li { margin: 2px 0; }
+.md hr { border: none; border-top: 1px solid #e6e9ee; margin: 12px 0; }
+.md code { background: #f0f2f5; padding: 1px 4px; border-radius: 4px; font-size: 12px; }
+.md pre { background: #f6f7f9; border: 1px solid #e6e9ee; border-radius: 8px; padding: 10px; overflow: auto;
+          font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; white-space: pre; }
+.md blockquote { margin: 8px 0; padding: 6px 12px; border-left: 3px solid #c4c9d0; background: #f8f9fb; color: #556; }
+.md a { color: #1f6feb; }
+.mdt { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 12.5px; }
+.mdt th, .mdt td { border: 1px solid #e0e4ea; padding: 5px 7px; text-align: left; vertical-align: top; }
+.mdt th { background: #eef1f5; }
