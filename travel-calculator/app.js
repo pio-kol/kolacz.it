@@ -200,7 +200,7 @@ function groupByFun(items) {
   const g = {};
   items.forEach(it => (g[it.f] = g[it.f] || []).push(it));
   return DATA.fun_order.filter(fn => g[fn])
-    .map(fn => [fn, g[fn].sort((a, b) => (a.k + a.n).localeCompare(b.k + b.n, "pl"))]);
+    .map(fn => [fn, g[fn].sort((a, b) => a.n.localeCompare(b.n, "pl"))]);
 }
 
 // ---------- render ----------
