@@ -175,8 +175,9 @@ function lekRow(l) {
   const roz = l.roz ? '<span class="badge roz">🤔 do rozważenia</span>' : "";
   const f = l.f ? `<span class=forma>${esc(l.f)}</span>` : "";
   const opis = l.na ? `<div class=opis>${esc(l.na)}</div>` : "";
+  const subst = l.s ? `<div class=subst>🧪 ${esc(l.s)}</div>` : "";
   return `<div class="arow${l.kup || l.roz ? " tobuy" : ""}"><div class=aname>${esc(l.n)}${inf}${rx}${kup}${roz}</div>
-    ${opis}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}</div></div>`;
+    ${subst}${opis}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}</div></div>`;
 }
 function srRow(s) {
   return `<div class=arow><div class=aname>${esc(s.n)}</div>
