@@ -94,7 +94,7 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 #bar .grandval { color: #6fe3a3; }
 #dock #search {
   display: block; width: calc(100% - 24px); margin: 0 12px 10px;
-  font: inherit; padding: 11px 16px; border-radius: 999px;
+  font: inherit; font-size: 16px; padding: 10px 16px; border-radius: 999px;
   border: 1px solid #3a3f47; background: #2a2e35; color: #fff;
 }
 #dock #search::placeholder { color: #9aa3ad; }
