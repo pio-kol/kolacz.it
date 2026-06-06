@@ -129,6 +129,8 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px;
          vertical-align: middle; margin-left: 5px; }
 .badge.rx { background: #fde2e2; color: #b4241f; }
+.badge.kup { background: #fff3cd; color: #8a5a00; }
+.arow.tobuy { background: #fffbf0; }
 .waz { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: #eef1f5; color: #556; }
 .waz.ok { background: #e3f5ea; color: #138a4e; }
 .waz.warn { background: #fdf0d8; color: #9a6a00; }

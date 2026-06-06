@@ -3,7 +3,7 @@
 "use strict";
 
 let DATA = null;
-const STATE = { tab: "leki", apt: "", rx: "all", q: "" };
+const STATE = { tab: "leki", apt: "", rx: "all", kup: "all", q: "" };
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -36,11 +36,14 @@ function init() {
     const b = e.target.closest(".tab"); if (!b) return;
     STATE.tab = b.dataset.tab;
     $$(".tab").forEach(t => t.classList.toggle("on", t === b));
-    $("#rxWrap").style.display = STATE.tab === "leki" ? "" : "none";
+    const lek = STATE.tab === "leki";
+    $("#rxWrap").style.display = lek ? "" : "none";
+    $("#kupWrap").style.display = lek ? "" : "none";
     render();
   };
   $("#aptFilter").onchange = e => { STATE.apt = e.target.value; render(); };
   $("#rxFilter").onchange = e => { STATE.rx = e.target.value; render(); };
+  $("#kupFilter").onchange = e => { STATE.kup = e.target.value; render(); };
   let t;
   $("#search").oninput = e => {
     STATE.q = e.target.value.trim();
@@ -68,7 +71,8 @@ const aptChips = (apt) => (apt || []).map(c => `<span class=aptchip>${esc(aptNam
 const matchApt = (apt) => !STATE.apt || (apt || []).includes(STATE.apt);
 function searchLek(l) {
   const q = dePL(STATE.q); if (!q) return true;
-  return [l.n, l.na, l.d, l.f, l.s].some(x => x && dePL(x).includes(q));
+  const extra = l.kup ? "do kupienia kupic" : "";
+  return [l.n, l.na, l.d, l.f, l.s, extra].some(x => x && dePL(x).includes(q));
 }
 function searchSr(s) {
   const q = dePL(STATE.q); if (!q) return true;
@@ -86,9 +90,10 @@ function group(items, keyFn, order) {
 
 function lekRow(l) {
   const rx = l.rx ? '<span class="badge rx">Rx</span>' : "";
+  const kup = l.kup ? '<span class="badge kup">🛒 do kupienia</span>' : "";
   const na = l.na ? ` <span class=sub2>${esc(l.na)}</span>` : "";
   const f = l.f ? `<span class=forma>${esc(l.f)}</span>` : "";
-  return `<div class=arow><div class=aname>${esc(l.n)}${rx}${na}</div>
+  return `<div class="arow${l.kup ? " tobuy" : ""}"><div class=aname>${esc(l.n)}${rx}${kup}${na}</div>
     <div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}</div></div>`;
 }
 function srRow(s) {
@@ -107,6 +112,8 @@ function render() {
     let L = (DATA.leki || []).filter(l => matchApt(l.apt) && searchLek(l));
     if (STATE.rx === "rx") L = L.filter(l => l.rx);
     else if (STATE.rx === "otc") L = L.filter(l => !l.rx);
+    if (STATE.kup === "kup") L = L.filter(l => l.kup);
+    else if (STATE.kup === "mam") L = L.filter(l => !l.kup);
     n = L.length;
     html = sections(group(L, l => l.d, DATA.dolegliwosci_order), lekRow);
   } else {
