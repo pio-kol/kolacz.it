@@ -34,12 +34,7 @@ function init() {
 
   $("#tabs").onclick = e => {
     const b = e.target.closest(".tab"); if (!b) return;
-    STATE.tab = b.dataset.tab;
-    $$(".tab").forEach(t => t.classList.toggle("on", t === b));
-    const lek = STATE.tab === "leki";
-    $("#rxWrap").style.display = lek ? "" : "none";
-    $("#locWrap").style.display = lek ? "" : "none";
-    render();
+    setTab(b.dataset.tab);
   };
   $("#aptFilter").onchange = e => { STATE.apt = e.target.value; render(); };
   $("#rxFilter").onchange = e => { STATE.rx = e.target.value; render(); };
@@ -49,6 +44,19 @@ function init() {
     STATE.q = e.target.value.trim();
     clearTimeout(t); t = setTimeout(render, 120);
   };
+  setTab(STATE.tab);
+}
+
+// Filtr "Apteczka" tylko dla Środków; "Lokalizacja"/"Recepta" tylko dla Leków
+// (na Lekach Lokalizacja i tak zawiera wszystkie apteczki — bez dublowania).
+function setTab(tab) {
+  STATE.tab = tab;
+  $$(".tab").forEach(t => t.classList.toggle("on", t.dataset.tab === tab));
+  const lek = tab === "leki";
+  $("#rxWrap").style.display = lek ? "" : "none";
+  $("#locWrap").style.display = lek ? "" : "none";
+  $("#aptWrap").style.display = lek ? "none" : "";
+  if (lek) { STATE.apt = ""; $("#aptFilter").value = ""; }
   render();
 }
 
