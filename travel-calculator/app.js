@@ -173,11 +173,11 @@ function compute() {
   const usun = new Set(t ? t.usun : []);
   const out = [];
   DATA.items.forEach(it => {
-    if (!matchTags(it)) return;                       // tylko wybrane aktywności (chipy)
     const forced = dodaj.has(it.n);
-    // powód odfiltrowania (jeśli jest) — pozycja pokaże się, ale z ilością 0
+    // powód odfiltrowania (jeśli jest) — pozycja pokaże się ZAWSZE, ale z ilością 0
     const r = forced ? null
       : usun.has(it.n) ? "decyzja: nie bierzemy"
+      : !matchTags(it) ? "inna aktywność"
       : rank(it.p) > rank(STATE.pasmo) ? "pasmo " + it.p
       : !tempOK(it) ? "cieplej niż " + STATE.temp.replace("_", " ")
       : (STATE.lod === "nie" && it.lod) ? "tylko na śniegu/lodzie" : null;
