@@ -13,6 +13,19 @@ const dePL = (s) => String(s || "").toLowerCase().normalize("NFD")
   .replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
 const fmt = (g) => !g ? "—" : (g >= 1000 ? (g / 1000).toFixed(2) + " kg" : g + " g");
 
+function writeUrl() {
+  const p = new URLSearchParams();
+  if (STATE.kosm) p.set("kosm", STATE.kosm);
+  if (STATE.q) p.set("q", STATE.q);
+  const qs = p.toString();
+  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+}
+function readUrl() {
+  const p = new URLSearchParams(location.search);
+  if (p.has("kosm")) STATE.kosm = p.get("kosm");
+  if (p.has("q")) STATE.q = p.get("q");
+}
+
 function init() {
   const K = DATA.kosmetyczki || {};
   const order = (DATA.kosmetyczki_order || Object.keys(K));
@@ -40,6 +53,9 @@ function init() {
     ftog.textContent = collapsed ? "▾" : "▴";
     ftog.setAttribute("aria-expanded", String(!collapsed));
   };
+  readUrl();
+  $("#kosmFilter").value = STATE.kosm;
+  $("#search").value = STATE.q;
   STATE.qty = load();
   render();
 }
@@ -82,6 +98,7 @@ function scrollToSec(id) {
   window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - off, behavior: "smooth" });
 }
 function render() {
+  writeUrl();
   const gs = groups();
   const app = $("#app");
   renderCatnav(gs);

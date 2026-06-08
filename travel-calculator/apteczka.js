@@ -15,6 +15,26 @@ const dePL = (s) => String(s || "").toLowerCase().normalize("NFD")
 const APT_FALLBACK = { dom_tylko: "🏠 Dom" };
 const aptName = (code) => (DATA.apt_nazwy && DATA.apt_nazwy[code]) || APT_FALLBACK[code] || code;
 
+// ---------- stan w URL (zapamiętywanie po refresh / link) ----------
+function writeUrl() {
+  const p = new URLSearchParams();
+  if (STATE.tab && STATE.tab !== "leki") p.set("tab", STATE.tab);
+  if (STATE.apt) p.set("apt", STATE.apt);
+  if (STATE.rx && STATE.rx !== "all") p.set("rx", STATE.rx);
+  if (STATE.loc && STATE.loc !== "mam") p.set("loc", STATE.loc);
+  if (STATE.q) p.set("q", STATE.q);
+  const qs = p.toString();
+  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+}
+function readUrl() {
+  const p = new URLSearchParams(location.search);
+  if (p.has("tab")) STATE.tab = p.get("tab");
+  if (p.has("apt")) STATE.apt = p.get("apt");
+  if (p.has("rx")) STATE.rx = p.get("rx");
+  if (p.has("loc")) STATE.loc = p.get("loc");
+  if (p.has("q")) STATE.q = p.get("q");
+}
+
 function init() {
   const leki = DATA.leki || [], srodki = DATA.srodki || [];
   $("#meta").textContent =
@@ -67,6 +87,11 @@ function init() {
   };
   $("#docClose").onclick = () => $("#docDlg").close();
   $("#docDlg").addEventListener("click", e => { if (e.target.id === "docDlg") $("#docDlg").close(); });
+  readUrl();
+  $("#aptFilter").value = STATE.apt;
+  $("#rxFilter").value = STATE.rx;
+  $("#locFilter").value = STATE.loc;
+  $("#search").value = STATE.q;
   setTab(STATE.tab);
 }
 
@@ -215,6 +240,7 @@ function sections(groups, rowFn, withTree) {
 }
 
 function render() {
+  writeUrl();
   let html = "", n = 0;
   if (STATE.tab === "leki") {
     let L = (DATA.leki || []).filter(l => matchApt(l.apt) && searchLek(l));

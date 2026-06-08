@@ -20,6 +20,30 @@ const esc = (s) => String(s).replace(/[&<>"]/g, c =>
 const fmt = (g) => !g ? "—" : (g >= 1000 ? (g / 1000).toFixed(2) + " kg" : g + " g");
 const rank = (p) => (DATA.pasmo_rank[p] != null ? DATA.pasmo_rank[p] : 0);
 
+// ---------- stan w URL (zapamiętywanie po refresh / udostępnianie linku) ----------
+function writeUrl() {
+  const p = new URLSearchParams();
+  if (STATE.tripId) p.set("trip", STATE.tripId);
+  if (STATE.pasmo) p.set("pasmo", STATE.pasmo);
+  if (STATE.temp) p.set("temp", STATE.temp);
+  if (STATE.lod && STATE.lod !== "dowolnie") p.set("lod", STATE.lod);
+  if (STATE.tags.size) p.set("tags", [...STATE.tags].join(","));
+  if (STATE.q) p.set("q", STATE.q);
+  const qs = p.toString();
+  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+}
+function readUrl() {
+  const p = new URLSearchParams(location.search);
+  if (![...p.keys()].length) return false;
+  if (p.has("trip")) STATE.tripId = p.get("trip");
+  if (p.has("pasmo")) STATE.pasmo = p.get("pasmo");
+  if (p.has("temp")) STATE.temp = p.get("temp");
+  STATE.lod = p.get("lod") || "dowolnie";
+  if (p.has("tags")) STATE.tags = new Set(p.get("tags").split(",").filter(Boolean));
+  if (p.has("q")) STATE.q = p.get("q");
+  return true;
+}
+
 // ---------- inicjalizacja ----------
 fetch("data.json", { cache: "no-cache" }).then(r => r.json()).then(d => { DATA = d; init(); })
   .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });
@@ -111,8 +135,14 @@ function init() {
   $("#exportClose").onclick = () => $("#exportDlg").close();
   $("#app").addEventListener("click", onStep);
 
-  // domyślnie zaznacz trekking, żeby coś było widać
-  STATE.tags.add("trekking");
+  // stan z URL (po refresh / z linku); inaczej domyślnie trekking
+  if (!readUrl()) STATE.tags.add("trekking");
+  STATE.qty = load();                 // ilości dla bieżącego wyjazdu (lsKey zależy od tripId)
+  trip.value = STATE.tripId || "";
+  $("#pasmo").value = STATE.pasmo;
+  $("#temp").value = STATE.temp;
+  $("#lod").value = STATE.lod;
+  $("#search").value = STATE.q;
   syncChips();
   render();
 }
@@ -246,6 +276,7 @@ function sectionsHtml(groups) {
 
 function render() {
   syncChips();
+  writeUrl();
   const t = currentTrip();
   $("#celinfo").innerHTML = STATE.q
     ? `<span class=powod>szukanie „${esc(STATE.q)}" — filtry pominięte</span>`

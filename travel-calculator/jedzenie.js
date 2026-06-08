@@ -32,6 +32,14 @@ function foodItems() {
   return DATA.jedzenie || [];
 }
 
+function writeUrl() {
+  history.replaceState(null, "", STATE.q ? "?q=" + encodeURIComponent(STATE.q) : location.pathname);
+}
+function readUrl() {
+  const p = new URLSearchParams(location.search);
+  if (p.has("q")) STATE.q = p.get("q");
+}
+
 function init() {
   const its = foodItems();
   $("#meta").textContent =
@@ -46,6 +54,8 @@ function init() {
     const a = e.target.closest(".catchip"); if (!a) return;
     e.preventDefault(); scrollToSec(a.dataset.sec);
   };
+  readUrl();
+  $("#search").value = STATE.q;
   STATE.qty = load();
   render();
 }
@@ -89,6 +99,7 @@ function scrollToSec(id) {
   window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - off, behavior: "smooth" });
 }
 function render() {
+  writeUrl();
   const gs = group();
   const app = $("#app");
   renderCatnav(gs);
