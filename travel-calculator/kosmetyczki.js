@@ -13,19 +13,6 @@ const dePL = (s) => String(s || "").toLowerCase().normalize("NFD")
   .replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
 const fmt = (g) => !g ? "—" : (g >= 1000 ? (g / 1000).toFixed(2) + " kg" : g + " g");
 
-function writeUrl() {
-  const p = new URLSearchParams();
-  if (STATE.kosm) p.set("kosm", STATE.kosm);
-  if (STATE.q) p.set("q", STATE.q);
-  const qs = p.toString();
-  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
-}
-function readUrl() {
-  const p = new URLSearchParams(location.search);
-  if (p.has("kosm")) STATE.kosm = p.get("kosm");
-  if (p.has("q")) STATE.q = p.get("q");
-}
-
 function init() {
   const K = DATA.kosmetyczki || {};
   const order = (DATA.kosmetyczki_order || Object.keys(K));
@@ -43,19 +30,6 @@ function init() {
     clearTimeout(t); t = setTimeout(render, 120);
   };
   $("#app").addEventListener("click", onStep);
-  $("#catnav").onclick = (e) => {
-    const a = e.target.closest(".catchip"); if (!a) return;
-    e.preventDefault(); scrollToSec(a.dataset.sec);
-  };
-  const fbody = $("#ctlbody"), ftog = $("#filtToggle");
-  if (fbody && ftog) ftog.onclick = () => {
-    const collapsed = fbody.classList.toggle("collapsed");
-    ftog.textContent = collapsed ? "▾" : "▴";
-    ftog.setAttribute("aria-expanded", String(!collapsed));
-  };
-  readUrl();
-  $("#kosmFilter").value = STATE.kosm;
-  $("#search").value = STATE.q;
   STATE.qty = load();
   render();
 }
@@ -86,27 +60,14 @@ function rowHtml(code, it) {
     <td class=n>${ut}</td><td class="n rt">${fmt(u * q)}</td></tr>`;
 }
 
-const secId = (s) => "sec-" + dePL(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-function renderCatnav(gs) {
-  const nav = $("#catnav"); if (!nav) return;
-  nav.innerHTML = (gs || []).map(([code, k]) =>
-    `<a class=catchip href="#${secId(code)}" data-sec="${secId(code)}">${esc(k.n || code)}</a>`).join("");
-}
-function scrollToSec(id) {
-  const sec = document.getElementById(id); if (!sec) return;
-  const off = ($("#controls").offsetHeight || 0) + 6;
-  window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - off, behavior: "smooth" });
-}
 function render() {
-  writeUrl();
   const gs = groups();
   const app = $("#app");
-  renderCatnav(gs);
   if (!gs.length) { app.innerHTML = `<p class=empty>Brak kosmetyków dla tych filtrów.</p>`; recompute(); return; }
   app.innerHTML = `<div class=cats>` + gs.map(([code, k]) => {
     const items = (k.items || []).filter(it => matchQ(it.n));
     const opis = k.opis ? `<div class=exnote>${esc(k.opis)}</div>` : "";
-    return `<section class="cat sec" id="${secId(code)}"><h3><span>${esc(k.n || code)}</span><span class=sub>—</span></h3>
+    return `<section class="cat sec"><h3><span>${esc(k.n || code)}</span><span class=sub>—</span></h3>
       ${opis}<table><tr><th>Kosmetyk</th><th class=q>Ilość</th><th class=n>g/szt</th><th class=n>Razem</th></tr>
       ${items.map(it => rowHtml(code, it)).join("")}</table></section>`;
   }).join("") + `</div>`;

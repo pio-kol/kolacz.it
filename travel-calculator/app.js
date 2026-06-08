@@ -20,30 +20,6 @@ const esc = (s) => String(s).replace(/[&<>"]/g, c =>
 const fmt = (g) => !g ? "—" : (g >= 1000 ? (g / 1000).toFixed(2) + " kg" : g + " g");
 const rank = (p) => (DATA.pasmo_rank[p] != null ? DATA.pasmo_rank[p] : 0);
 
-// ---------- stan w URL (zapamiętywanie po refresh / udostępnianie linku) ----------
-function writeUrl() {
-  const p = new URLSearchParams();
-  if (STATE.tripId) p.set("trip", STATE.tripId);
-  if (STATE.pasmo) p.set("pasmo", STATE.pasmo);
-  if (STATE.temp) p.set("temp", STATE.temp);
-  if (STATE.lod && STATE.lod !== "dowolnie") p.set("lod", STATE.lod);
-  if (STATE.tags.size) p.set("tags", [...STATE.tags].join(","));
-  if (STATE.q) p.set("q", STATE.q);
-  const qs = p.toString();
-  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
-}
-function readUrl() {
-  const p = new URLSearchParams(location.search);
-  if (![...p.keys()].length) return false;
-  if (p.has("trip")) STATE.tripId = p.get("trip");
-  if (p.has("pasmo")) STATE.pasmo = p.get("pasmo");
-  if (p.has("temp")) STATE.temp = p.get("temp");
-  STATE.lod = p.get("lod") || "dowolnie";
-  if (p.has("tags")) STATE.tags = new Set(p.get("tags").split(",").filter(Boolean));
-  if (p.has("q")) STATE.q = p.get("q");
-  return true;
-}
-
 // ---------- inicjalizacja ----------
 fetch("data.json", { cache: "no-cache" }).then(r => r.json()).then(d => { DATA = d; init(); })
   .catch(e => { $("#app").innerHTML = "<p class=empty>Nie udało się wczytać data.json (" + e + ")</p>"; });
@@ -102,11 +78,6 @@ function init() {
     ftog.setAttribute("aria-expanded", open);
   };
   ftog.onclick = () => setFilters(body.classList.contains("collapsed"));
-  setFilters(false);            // domyślnie filtry zwinięte
-  $("#catnav").onclick = (e) => {
-    const a = e.target.closest(".catchip"); if (!a) return;
-    e.preventDefault(); scrollToSec(a.dataset.sec);
-  };
   let lastY = 0;
   window.addEventListener("scroll", () => {
     const y = window.scrollY || 0;
@@ -135,14 +106,8 @@ function init() {
   $("#exportClose").onclick = () => $("#exportDlg").close();
   $("#app").addEventListener("click", onStep);
 
-  // stan z URL (po refresh / z linku); inaczej domyślnie trekking
-  if (!readUrl()) STATE.tags.add("trekking");
-  STATE.qty = load();                 // ilości dla bieżącego wyjazdu (lsKey zależy od tripId)
-  trip.value = STATE.tripId || "";
-  $("#pasmo").value = STATE.pasmo;
-  $("#temp").value = STATE.temp;
-  $("#lod").value = STATE.lod;
-  $("#search").value = STATE.q;
+  // domyślnie zaznacz trekking, żeby coś było widać
+  STATE.tags.add("trekking");
   syncChips();
   render();
 }
@@ -210,7 +175,7 @@ function compute() {
   DATA.items.forEach(it => {
     const forced = dodaj.has(it.n);
     // „do rozważenia" (nie posiadam) — zawsze widoczne we własnej sekcji, ilość 0
-    if (it.roz && !forced) { out.push(Object.assign({}, it, { _excl: true })); return; }
+    if (it.roz && !forced) { out.push(Object.assign({}, it, { _r: "do rozważenia — nie mam", _excl: true })); return; }
     // powód odfiltrowania (jeśli jest) — pozycja pokaże się ZAWSZE, ale z ilością 0
     const r = forced ? null
       : usun.has(it.n) ? "decyzja: nie bierzemy"
@@ -233,7 +198,7 @@ function compute() {
   return out;
 }
 
-const ROZ_FUN = "🤔 Do rozważenia";
+const ROZ_FUN = "🤔 Do rozważenia (nie mam)";
 function groupByFun(items) {
   const g = {};
   items.forEach(it => { const fn = it.roz ? ROZ_FUN : it.f; (g[fn] = g[fn] || []).push(it); });
@@ -255,28 +220,15 @@ function rowHtml(it) {
     <td class=n>${ut}</td><td class="n rt">${fmt(u * q)}</td></tr>`;
 }
 
-const secId = (s) => "sec-" + dePL(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-function renderCatnav(groups) {
-  const nav = $("#catnav"); if (!nav) return;
-  nav.innerHTML = groups.map(([fn]) =>
-    `<a class=catchip href="#${secId(fn)}" data-sec="${secId(fn)}">${esc(fn)}</a>`).join("");
-}
-function scrollToSec(id) {
-  const sec = document.getElementById(id); if (!sec) return;
-  const off = ($("#controls").offsetHeight || 0) + 6;
-  window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - off, behavior: "smooth" });
-}
-
 function sectionsHtml(groups) {
   return groups.map(([fn, items]) =>
-    `<section class="cat sec" id="${secId(fn)}"><h3><span>${esc(fn)}</span><span class=sub>—</span></h3>
+    `<section class="cat sec"><h3><span>${esc(fn)}</span><span class=sub>—</span></h3>
      <table><tr><th>Rzecz</th><th class=q>Ilość</th><th class=n>g/szt</th><th class=n>Razem</th></tr>
      ${items.map(rowHtml).join("")}</table></section>`).join("");
 }
 
 function render() {
   syncChips();
-  writeUrl();
   const t = currentTrip();
   $("#celinfo").innerHTML = STATE.q
     ? `<span class=powod>szukanie „${esc(STATE.q)}" — filtry pominięte</span>`
@@ -287,15 +239,12 @@ function render() {
   const items = compute();
   const app = $("#app");
   if (!items.length) {
-    renderCatnav([]);
     app.innerHTML = STATE.q
       ? `<p class=empty>Brak rzeczy pasujących do „${esc(STATE.q)}".</p>`
       : "<p class=empty>Brak rzeczy dla tych filtrów. Zaznacz aktywność lub poszerz pasmo.</p>";
     recompute(); return;
   }
-  const groups = groupByFun(items);
-  renderCatnav(groups);
-  app.innerHTML = `<div class=cats id=main-sections>${sectionsHtml(groups)}</div>`;
+  app.innerHTML = `<div class=cats id=main-sections>${sectionsHtml(groupByFun(items))}</div>`;
   recompute();
 }
 

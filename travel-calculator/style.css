@@ -49,7 +49,7 @@ input[type=search] { flex: 1 1 180px; }
 /* ---- wyniki ---- */
 #app { padding: 12px 14px 0; }
 .cats { column-gap: 14px; }
-/* Jedna kolumna także na desktopie (bez układu 2-kolumnowego). */
+@media screen and (min-width: 820px) { .cats { column-count: 2; } }
 .cat { break-inside: avoid; -webkit-column-break-inside: avoid; margin: 0 0 12px;
        background: #fff; border: 1px solid #e6e9ee; border-radius: 9px; overflow: hidden; }
 .cat h3 {
@@ -108,15 +108,6 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 
 /* ---- nawigacja między stronami (Pakowanie / Apteczka) ---- */
 .pagenav { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; justify-content: flex-start; }
-/* Szybka nawigacja między kategoriami (przewijalny pasek chipów). */
-.catnav { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; margin-top: 4px;
-          border-top: 1px solid #eef1f5; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-.catnav:empty { display: none; }
-.catchip { white-space: nowrap; flex: none; font-size: 11px; font-weight: 600; cursor: pointer;
-           padding: 3px 9px; border-radius: 999px; background: #eef1f5; color: #334a5e;
-           border: 1px solid #dce1e8; text-decoration: none; }
-.catchip:hover { background: #1f6feb; border-color: #1f6feb; color: #fff; }
-.sec { scroll-margin-top: 120px; }
 .navlink {
   font-size: 12px; font-weight: 600; text-decoration: none; color: #44505e;
   padding: 5px 10px; border: 1px solid #c4c9d0; border-radius: 999px; background: #fff;
