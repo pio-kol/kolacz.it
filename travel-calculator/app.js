@@ -78,6 +78,10 @@ function init() {
     ftog.setAttribute("aria-expanded", open);
   };
   ftog.onclick = () => setFilters(body.classList.contains("collapsed"));
+  $("#catnav").onclick = (e) => {
+    const a = e.target.closest(".catchip"); if (!a) return;
+    e.preventDefault(); scrollToSec(a.dataset.sec);
+  };
   let lastY = 0;
   window.addEventListener("scroll", () => {
     const y = window.scrollY || 0;
@@ -220,9 +224,21 @@ function rowHtml(it) {
     <td class=n>${ut}</td><td class="n rt">${fmt(u * q)}</td></tr>`;
 }
 
+const secId = (s) => "sec-" + dePL(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+function renderCatnav(groups) {
+  const nav = $("#catnav"); if (!nav) return;
+  nav.innerHTML = groups.map(([fn]) =>
+    `<a class=catchip href="#${secId(fn)}" data-sec="${secId(fn)}">${esc(fn)}</a>`).join("");
+}
+function scrollToSec(id) {
+  const sec = document.getElementById(id); if (!sec) return;
+  const off = ($("#controls").offsetHeight || 0) + 6;
+  window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - off, behavior: "smooth" });
+}
+
 function sectionsHtml(groups) {
   return groups.map(([fn, items]) =>
-    `<section class="cat sec"><h3><span>${esc(fn)}</span><span class=sub>—</span></h3>
+    `<section class="cat sec" id="${secId(fn)}"><h3><span>${esc(fn)}</span><span class=sub>—</span></h3>
      <table><tr><th>Rzecz</th><th class=q>Ilość</th><th class=n>g/szt</th><th class=n>Razem</th></tr>
      ${items.map(rowHtml).join("")}</table></section>`).join("");
 }
@@ -239,12 +255,15 @@ function render() {
   const items = compute();
   const app = $("#app");
   if (!items.length) {
+    renderCatnav([]);
     app.innerHTML = STATE.q
       ? `<p class=empty>Brak rzeczy pasujących do „${esc(STATE.q)}".</p>`
       : "<p class=empty>Brak rzeczy dla tych filtrów. Zaznacz aktywność lub poszerz pasmo.</p>";
     recompute(); return;
   }
-  app.innerHTML = `<div class=cats id=main-sections>${sectionsHtml(groupByFun(items))}</div>`;
+  const groups = groupByFun(items);
+  renderCatnav(groups);
+  app.innerHTML = `<div class=cats id=main-sections>${sectionsHtml(groups)}</div>`;
   recompute();
 }
 

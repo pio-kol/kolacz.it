@@ -55,6 +55,10 @@ function init() {
     else if (kind === "u") openDoc(keyv, (DATA.ulotki || {})[keyv]);
     else if (kind === "d") openDoc("🌳 Drzewko — " + keyv, (DATA.drzewka || {})[keyv]);
   });
+  $("#catnav").onclick = (e) => {
+    const a = e.target.closest(".catchip"); if (!a) return;
+    e.preventDefault(); scrollToSec(a.dataset.sec);
+  };
   $("#docClose").onclick = () => $("#docDlg").close();
   $("#docDlg").addEventListener("click", e => { if (e.target.id === "docDlg") $("#docDlg").close(); });
   setTab(STATE.tab);
@@ -184,11 +188,22 @@ function srRow(s) {
   return `<div class=arow><div class=aname>${esc(s.n)}</div>
     <div class=ameta>${aptChips(s.apt)}</div></div>`;
 }
+const secId = (s) => "sec-" + dePL(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+function renderCatnav(groups) {
+  const nav = $("#catnav"); if (!nav) return;
+  nav.innerHTML = (groups || []).map(([k]) =>
+    `<a class=catchip href="#${secId(k)}" data-sec="${secId(k)}">${esc(k)}</a>`).join("");
+}
+function scrollToSec(id) {
+  const sec = document.getElementById(id); if (!sec) return;
+  const off = ($("#controls").offsetHeight || 0) + 6;
+  window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - off, behavior: "smooth" });
+}
 function sections(groups, rowFn, withTree) {
   return groups.map(([k, its]) => {
     const tree = (withTree && DATA.drzewka && DATA.drzewka[k])
       ? ` <button class="docbtn dtree" data-doc="d:${esc(k)}" title="Drzewko decyzyjne">🌳</button>` : "";
-    return `<section class="cat sec"><h3><span>${esc(k)}${tree}</span><span class=sub>${its.length}</span></h3>
+    return `<section class="cat sec" id="${secId(k)}"><h3><span>${esc(k)}${tree}</span><span class=sub>${its.length}</span></h3>
      <div class=alist>${its.map(rowFn).join("")}</div></section>`;
   }).join("");
 }
@@ -205,11 +220,15 @@ function render() {
       L = L.filter(l => lekBucket(l) === STATE.loc);
     }
     n = L.length;
-    html = sections(group(L, l => l.d, DATA.dolegliwosci_order), lekRow, true);
+    const groups = group(L, l => l.d, DATA.dolegliwosci_order);
+    renderCatnav(groups);
+    html = sections(groups, lekRow, true);
   } else {
     const S = (DATA.srodki || []).filter(s => matchApt(s.apt) && searchSr(s));
     n = S.length;
-    html = sections(group(S, s => s.k, DATA.srodki_order), srRow);
+    const groups = group(S, s => s.k, DATA.srodki_order);
+    renderCatnav(groups);
+    html = sections(groups, srRow);
   }
   $("#app").innerHTML = html || `<p class=empty>Brak pozycji dla tych filtrów.</p>`;
   $(".grandval").textContent = n;
