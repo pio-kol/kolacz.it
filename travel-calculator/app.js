@@ -78,6 +78,7 @@ function init() {
     ftog.setAttribute("aria-expanded", open);
   };
   ftog.onclick = () => setFilters(body.classList.contains("collapsed"));
+  setFilters(false);            // domyślnie filtry zwinięte
   $("#catnav").onclick = (e) => {
     const a = e.target.closest(".catchip"); if (!a) return;
     e.preventDefault(); scrollToSec(a.dataset.sec);
