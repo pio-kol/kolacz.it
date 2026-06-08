@@ -210,7 +210,7 @@ function compute() {
   DATA.items.forEach(it => {
     const forced = dodaj.has(it.n);
     // „do rozważenia" (nie posiadam) — zawsze widoczne we własnej sekcji, ilość 0
-    if (it.roz && !forced) { out.push(Object.assign({}, it, { _r: "do rozważenia — nie mam", _excl: true })); return; }
+    if (it.roz && !forced) { out.push(Object.assign({}, it, { _excl: true })); return; }
     // powód odfiltrowania (jeśli jest) — pozycja pokaże się ZAWSZE, ale z ilością 0
     const r = forced ? null
       : usun.has(it.n) ? "decyzja: nie bierzemy"
@@ -233,7 +233,7 @@ function compute() {
   return out;
 }
 
-const ROZ_FUN = "🤔 Do rozważenia (nie mam)";
+const ROZ_FUN = "🤔 Do rozważenia";
 function groupByFun(items) {
   const g = {};
   items.forEach(it => { const fn = it.roz ? ROZ_FUN : it.f; (g[fn] = g[fn] || []).push(it); });
