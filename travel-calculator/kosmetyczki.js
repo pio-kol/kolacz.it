@@ -34,6 +34,12 @@ function init() {
     const a = e.target.closest(".catchip"); if (!a) return;
     e.preventDefault(); scrollToSec(a.dataset.sec);
   };
+  const fbody = $("#ctlbody"), ftog = $("#filtToggle");
+  if (fbody && ftog) ftog.onclick = () => {
+    const collapsed = fbody.classList.toggle("collapsed");
+    ftog.textContent = collapsed ? "▾" : "▴";
+    ftog.setAttribute("aria-expanded", String(!collapsed));
+  };
   STATE.qty = load();
   render();
 }

@@ -59,6 +59,12 @@ function init() {
     const a = e.target.closest(".catchip"); if (!a) return;
     e.preventDefault(); scrollToSec(a.dataset.sec);
   };
+  const fbody = $("#ctlbody"), ftog = $("#filtToggle");
+  if (fbody && ftog) ftog.onclick = () => {
+    const open = fbody.classList.toggle("collapsed");      // toggle zwraca stan po zmianie
+    ftog.textContent = open ? "▾" : "▴";
+    ftog.setAttribute("aria-expanded", String(!open));
+  };
   $("#docClose").onclick = () => $("#docDlg").close();
   $("#docDlg").addEventListener("click", e => { if (e.target.id === "docDlg") $("#docDlg").close(); });
   setTab(STATE.tab);
