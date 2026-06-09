@@ -24,7 +24,7 @@ function writeUrl() {
   if (STATE.loc && STATE.loc !== "mam") p.set("loc", STATE.loc);
   if (STATE.q) p.set("q", STATE.q);
   const qs = p.toString();
-  history.replaceState(null, "", (qs ? "?" + qs : location.pathname) + location.hash);
+  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
 }
 function readUrl() {
   const p = new URLSearchParams(location.search);
@@ -77,9 +77,7 @@ function init() {
   });
   $("#catnav").onclick = (e) => {
     const a = e.target.closest(".catchip"); if (!a) return;
-    e.preventDefault();
-    history.replaceState(null, "", location.pathname + location.search + "#" + a.dataset.sec);
-    scrollToSec(a.dataset.sec);
+    e.preventDefault(); scrollToSec(a.dataset.sec);
   };
   const fbody = $("#ctlbody"), ftog = $("#filtToggle");
   if (fbody && ftog) ftog.onclick = () => {
@@ -95,7 +93,15 @@ function init() {
   $("#locFilter").value = STATE.loc;
   $("#search").value = STATE.q;
   setTab(STATE.tab);
-  if (location.hash) requestAnimationFrame(() => scrollToSec(location.hash.slice(1)));
+  // głęboki link z Vademecum: apteczka.html?lek=<nazwa> → odfiltruj i otwórz ulotkę
+  const lek = new URLSearchParams(location.search).get("lek");
+  if (lek) {
+    STATE.tab = "leki"; STATE.loc = "all";
+    $("#locFilter").value = "all";
+    STATE.q = lek; $("#search").value = lek;
+    setTab("leki");
+    if (DATA.ulotki && DATA.ulotki[lek]) openDoc(lek, DATA.ulotki[lek]);
+  }
 }
 
 function openDoc(title, md) {
@@ -215,8 +221,12 @@ function lekRow(l) {
   const f = l.f ? `<span class=forma>${esc(l.f)}</span>` : "";
   const opis = l.na ? `<div class=opis>${esc(l.na)}</div>` : "";
   const subst = l.s ? `<div class=subst>🧪 ${esc(l.s)}</div>` : "";
+  // referencje do Vademecum chorób górskich
+  const vad = (l.vad || []).map(v =>
+    `<a class=vadref href="vademecum.html#${esc(v.slug)}" title="Vademecum: ${esc(v.label)}">🏔️ ${esc(v.label)}</a>`).join("");
+  const vadrow = vad ? `<div class=vadrow>${vad}</div>` : "";
   return `<div class="arow${l.kup || l.roz ? " tobuy" : ""}"><div class=aname>${esc(l.n)}${inf}${rx}${kup}${roz}</div>
-    ${subst}${opis}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}</div></div>`;
+    ${subst}${opis}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}</div>${vadrow}</div>`;
 }
 function srRow(s) {
   return `<div class=arow><div class=aname>${esc(s.n)}</div>

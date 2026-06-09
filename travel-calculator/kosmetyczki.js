@@ -18,7 +18,7 @@ function writeUrl() {
   if (STATE.kosm) p.set("kosm", STATE.kosm);
   if (STATE.q) p.set("q", STATE.q);
   const qs = p.toString();
-  history.replaceState(null, "", (qs ? "?" + qs : location.pathname) + location.hash);
+  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
 }
 function readUrl() {
   const p = new URLSearchParams(location.search);
@@ -45,9 +45,7 @@ function init() {
   $("#app").addEventListener("click", onStep);
   $("#catnav").onclick = (e) => {
     const a = e.target.closest(".catchip"); if (!a) return;
-    e.preventDefault();
-    history.replaceState(null, "", location.pathname + location.search + "#" + a.dataset.sec);
-    scrollToSec(a.dataset.sec);
+    e.preventDefault(); scrollToSec(a.dataset.sec);
   };
   const fbody = $("#ctlbody"), ftog = $("#filtToggle");
   if (fbody && ftog) ftog.onclick = () => {
@@ -60,7 +58,6 @@ function init() {
   $("#search").value = STATE.q;
   STATE.qty = load();
   render();
-  if (location.hash) requestAnimationFrame(() => scrollToSec(location.hash.slice(1)));
 }
 
 // ---------- localStorage (ilości) ----------
