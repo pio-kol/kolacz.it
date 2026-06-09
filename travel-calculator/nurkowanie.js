@@ -18,7 +18,7 @@ const CAT_ORDER = ["Nurkowe", "Kąpielowe"];
 function diveItems() { return DATA.nurkowanie || []; }
 
 function writeUrl() {
-  history.replaceState(null, "", STATE.q ? "?q=" + encodeURIComponent(STATE.q) : location.pathname);
+  history.replaceState(null, "", (STATE.q ? "?q=" + encodeURIComponent(STATE.q) : location.pathname) + location.hash);
 }
 function readUrl() {
   const p = new URLSearchParams(location.search);
@@ -37,12 +37,15 @@ function init() {
   $("#app").addEventListener("click", onStep);
   $("#catnav").onclick = (e) => {
     const a = e.target.closest(".catchip"); if (!a) return;
-    e.preventDefault(); scrollToSec(a.dataset.sec);
+    e.preventDefault();
+    history.replaceState(null, "", location.pathname + location.search + "#" + a.dataset.sec);
+    scrollToSec(a.dataset.sec);
   };
   readUrl();
   $("#search").value = STATE.q;
   STATE.qty = load();
   render();
+  if (location.hash) requestAnimationFrame(() => scrollToSec(location.hash.slice(1)));
 }
 
 // ---------- localStorage (ilości) ----------

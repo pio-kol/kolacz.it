@@ -30,7 +30,7 @@ function writeUrl() {
   if (STATE.tags.size) p.set("tags", [...STATE.tags].join(","));
   if (STATE.q) p.set("q", STATE.q);
   const qs = p.toString();
-  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+  history.replaceState(null, "", (qs ? "?" + qs : location.pathname) + location.hash);
 }
 function readUrl() {
   const p = new URLSearchParams(location.search);
@@ -105,7 +105,9 @@ function init() {
   setFilters(false);            // domyślnie filtry zwinięte
   $("#catnav").onclick = (e) => {
     const a = e.target.closest(".catchip"); if (!a) return;
-    e.preventDefault(); scrollToSec(a.dataset.sec);
+    e.preventDefault();
+    history.replaceState(null, "", location.pathname + location.search + "#" + a.dataset.sec);
+    scrollToSec(a.dataset.sec);
   };
   let lastY = 0;
   window.addEventListener("scroll", () => {
@@ -145,6 +147,7 @@ function init() {
   $("#search").value = STATE.q;
   syncChips();
   render();
+  if (location.hash) requestAnimationFrame(() => scrollToSec(location.hash.slice(1)));
 }
 
 // ---------- preset wyjazdu ----------
