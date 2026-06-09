@@ -24,7 +24,7 @@ function writeUrl() {
   if (STATE.loc && STATE.loc !== "mam") p.set("loc", STATE.loc);
   if (STATE.q) p.set("q", STATE.q);
   const qs = p.toString();
-  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+  history.replaceState(null, "", (qs ? "?" + qs : location.pathname) + location.hash);
 }
 function readUrl() {
   const p = new URLSearchParams(location.search);
@@ -77,7 +77,9 @@ function init() {
   });
   $("#catnav").onclick = (e) => {
     const a = e.target.closest(".catchip"); if (!a) return;
-    e.preventDefault(); scrollToSec(a.dataset.sec);
+    e.preventDefault();
+    history.replaceState(null, "", location.pathname + location.search + "#" + a.dataset.sec);
+    scrollToSec(a.dataset.sec);
   };
   const fbody = $("#ctlbody"), ftog = $("#filtToggle");
   if (fbody && ftog) ftog.onclick = () => {
@@ -93,6 +95,7 @@ function init() {
   $("#locFilter").value = STATE.loc;
   $("#search").value = STATE.q;
   setTab(STATE.tab);
+  if (location.hash) requestAnimationFrame(() => scrollToSec(location.hash.slice(1)));
 }
 
 function openDoc(title, md) {
