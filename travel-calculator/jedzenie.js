@@ -32,6 +32,14 @@ function foodItems() {
   return DATA.jedzenie || [];
 }
 
+function writeUrl() {
+  history.replaceState(null, "", STATE.q ? "?q=" + encodeURIComponent(STATE.q) : location.pathname);
+}
+function readUrl() {
+  const p = new URLSearchParams(location.search);
+  if (p.has("q")) STATE.q = p.get("q");
+}
+
 function init() {
   const its = foodItems();
   $("#meta").textContent =
@@ -42,6 +50,12 @@ function init() {
     clearTimeout(t); t = setTimeout(render, 120);
   };
   $("#app").addEventListener("click", onStep);
+  $("#catnav").onclick = (e) => {
+    const a = e.target.closest(".catchip"); if (!a) return;
+    e.preventDefault(); scrollToSec(a.dataset.sec);
+  };
+  readUrl();
+  $("#search").value = STATE.q;
   STATE.qty = load();
   render();
 }
@@ -73,12 +87,25 @@ function rowHtml(it) {
     <td class=n>${ut}</td><td class="n rt">${fmt(u * q)}</td></tr>`;
 }
 
+const secId = (s) => "sec-" + dePL(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+function renderCatnav(groups) {
+  const nav = $("#catnav"); if (!nav) return;
+  nav.innerHTML = (groups || []).map(([cat]) =>
+    `<a class=catchip href="#${secId(cat)}" data-sec="${secId(cat)}">${esc(cat)}</a>`).join("");
+}
+function scrollToSec(id) {
+  const sec = document.getElementById(id); if (!sec) return;
+  const off = ($("#controls").offsetHeight || 0) + 6;
+  window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - off, behavior: "smooth" });
+}
 function render() {
+  writeUrl();
   const gs = group();
   const app = $("#app");
+  renderCatnav(gs);
   if (!gs.length) { app.innerHTML = `<p class=empty>Brak pozycji dla tych filtrów.</p>`; recompute(); return; }
   app.innerHTML = `<div class=cats>` + gs.map(([cat, items]) =>
-    `<section class="cat sec"><h3><span>${esc(cat)}</span><span class=sub>—</span></h3>
+    `<section class="cat sec" id="${secId(cat)}"><h3><span>${esc(cat)}</span><span class=sub>—</span></h3>
       <table><tr><th>Pozycja</th><th class=q>Ilość</th><th class=n>g/szt</th><th class=n>Razem</th></tr>
       ${items.map(rowHtml).join("")}</table></section>`).join("") + `</div>`;
   recompute();

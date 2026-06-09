@@ -4,7 +4,7 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <title>🧴 Kosmetyczki — zawartość</title>
-<link rel=stylesheet href="style.css?v=c2f28b72">
+<link rel=stylesheet href="style.css?v=b3511d45">
 </head>
 <body class=aptpage>
 <section id=controls>
@@ -14,16 +14,19 @@
       <a class=navlink href="apteczka.html">💊 Apteczka</a>
       <a class="navlink on" href="kosmetyczki.html">🧴 Kosmetyczki</a>
       <a class=navlink href="jedzenie.html">🍫 Jedzenie</a>
+      <a class=navlink href="nurkowanie.html">🤿 Nurkowanie</a>
     </nav>
+    <button id=filtToggle type=button aria-expanded=false aria-label="Pokaż/ukryj filtry" title="Filtry">▾</button>
   </div>
-  <div id=ctlbody>
   <div id=meta class=meta></div>
+  <div id=ctlbody class=collapsed>
   <div class=ctlrow>
     <label class=fld>Kosmetyczka
       <select id=kosmFilter><option value="">— wszystkie —</option></select>
     </label>
   </div>
   </div>
+  <nav id=catnav class=catnav></nav>
 </section>
 
 <main id=app></main>
@@ -33,6 +36,6 @@
   <input id=search type=search placeholder="🔍 Szukaj kosmetyku…" autocomplete=off>
 </div>
 
-<script src="kosmetyczki.js?v=e9c90610"></script>
+<script src="kosmetyczki.js?v=481ce50b"></script>
 </body>
 </html>

@@ -15,6 +15,26 @@ const dePL = (s) => String(s || "").toLowerCase().normalize("NFD")
 const APT_FALLBACK = { dom_tylko: "🏠 Dom" };
 const aptName = (code) => (DATA.apt_nazwy && DATA.apt_nazwy[code]) || APT_FALLBACK[code] || code;
 
+// ---------- stan w URL (zapamiętywanie po refresh / link) ----------
+function writeUrl() {
+  const p = new URLSearchParams();
+  if (STATE.tab && STATE.tab !== "leki") p.set("tab", STATE.tab);
+  if (STATE.apt) p.set("apt", STATE.apt);
+  if (STATE.rx && STATE.rx !== "all") p.set("rx", STATE.rx);
+  if (STATE.loc && STATE.loc !== "mam") p.set("loc", STATE.loc);
+  if (STATE.q) p.set("q", STATE.q);
+  const qs = p.toString();
+  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+}
+function readUrl() {
+  const p = new URLSearchParams(location.search);
+  if (p.has("tab")) STATE.tab = p.get("tab");
+  if (p.has("apt")) STATE.apt = p.get("apt");
+  if (p.has("rx")) STATE.rx = p.get("rx");
+  if (p.has("loc")) STATE.loc = p.get("loc");
+  if (p.has("q")) STATE.q = p.get("q");
+}
+
 function init() {
   const leki = DATA.leki || [], srodki = DATA.srodki || [];
   $("#meta").textContent =
@@ -55,8 +75,23 @@ function init() {
     else if (kind === "u") openDoc(keyv, (DATA.ulotki || {})[keyv]);
     else if (kind === "d") openDoc("🌳 Drzewko — " + keyv, (DATA.drzewka || {})[keyv]);
   });
+  $("#catnav").onclick = (e) => {
+    const a = e.target.closest(".catchip"); if (!a) return;
+    e.preventDefault(); scrollToSec(a.dataset.sec);
+  };
+  const fbody = $("#ctlbody"), ftog = $("#filtToggle");
+  if (fbody && ftog) ftog.onclick = () => {
+    const open = fbody.classList.toggle("collapsed");      // toggle zwraca stan po zmianie
+    ftog.textContent = open ? "▾" : "▴";
+    ftog.setAttribute("aria-expanded", String(!open));
+  };
   $("#docClose").onclick = () => $("#docDlg").close();
   $("#docDlg").addEventListener("click", e => { if (e.target.id === "docDlg") $("#docDlg").close(); });
+  readUrl();
+  $("#aptFilter").value = STATE.apt;
+  $("#rxFilter").value = STATE.rx;
+  $("#locFilter").value = STATE.loc;
+  $("#search").value = STATE.q;
   setTab(STATE.tab);
 }
 
@@ -184,16 +219,28 @@ function srRow(s) {
   return `<div class=arow><div class=aname>${esc(s.n)}</div>
     <div class=ameta>${aptChips(s.apt)}</div></div>`;
 }
+const secId = (s) => "sec-" + dePL(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+function renderCatnav(groups) {
+  const nav = $("#catnav"); if (!nav) return;
+  nav.innerHTML = (groups || []).map(([k]) =>
+    `<a class=catchip href="#${secId(k)}" data-sec="${secId(k)}">${esc(k)}</a>`).join("");
+}
+function scrollToSec(id) {
+  const sec = document.getElementById(id); if (!sec) return;
+  const off = ($("#controls").offsetHeight || 0) + 6;
+  window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - off, behavior: "smooth" });
+}
 function sections(groups, rowFn, withTree) {
   return groups.map(([k, its]) => {
     const tree = (withTree && DATA.drzewka && DATA.drzewka[k])
       ? ` <button class="docbtn dtree" data-doc="d:${esc(k)}" title="Drzewko decyzyjne">🌳</button>` : "";
-    return `<section class="cat sec"><h3><span>${esc(k)}${tree}</span><span class=sub>${its.length}</span></h3>
+    return `<section class="cat sec" id="${secId(k)}"><h3><span>${esc(k)}${tree}</span><span class=sub>${its.length}</span></h3>
      <div class=alist>${its.map(rowFn).join("")}</div></section>`;
   }).join("");
 }
 
 function render() {
+  writeUrl();
   let html = "", n = 0;
   if (STATE.tab === "leki") {
     let L = (DATA.leki || []).filter(l => matchApt(l.apt) && searchLek(l));
@@ -205,11 +252,15 @@ function render() {
       L = L.filter(l => lekBucket(l) === STATE.loc);
     }
     n = L.length;
-    html = sections(group(L, l => l.d, DATA.dolegliwosci_order), lekRow, true);
+    const groups = group(L, l => l.d, DATA.dolegliwosci_order);
+    renderCatnav(groups);
+    html = sections(groups, lekRow, true);
   } else {
     const S = (DATA.srodki || []).filter(s => matchApt(s.apt) && searchSr(s));
     n = S.length;
-    html = sections(group(S, s => s.k, DATA.srodki_order), srRow);
+    const groups = group(S, s => s.k, DATA.srodki_order);
+    renderCatnav(groups);
+    html = sections(groups, srRow);
   }
   $("#app").innerHTML = html || `<p class=empty>Brak pozycji dla tych filtrów.</p>`;
   $(".grandval").textContent = n;
