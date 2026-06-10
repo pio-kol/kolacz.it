@@ -4,18 +4,17 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <title>💊 Apteczka — leki i środki</title>
-<link rel=stylesheet href="style.css?v=b85a5d6c">
+<link rel=stylesheet href="style.css?v=55f70cf2">
 </head>
 <body class=aptpage>
 <section id=controls>
   <div class=ctlhead>
     <nav class=pagenav>
-      <a class=navlink href="index.html">🎒 Pakowanie</a>
+      <a class="navlink" href="index.html">🎒 Pakowanie</a>
       <a class="navlink on" href="apteczka.html">💊 Apteczka</a>
-      <a class=navlink href="kosmetyczki.html">🧴 Kosmetyczki</a>
-      <a class=navlink href="jedzenie.html">🍫 Jedzenie</a>
-      <a class=navlink href="nurkowanie.html">🤿 Nurkowanie</a>
-      <a class=navlink href="vademecum.html">🏔️ Choroby górskie</a>
+      <a class="navlink" href="kosmetyczki.html">🧴 Kosmetyczki</a>
+      <a class="navlink" href="jedzenie.html">🍫 Jedzenie</a>
+      <a class="navlink" href="vademecum.html">🏔️ Choroby górskie</a>
     </nav>
     <button id=filtToggle type=button aria-expanded=false aria-label="Pokaż/ukryj filtry" title="Filtry">▾</button>
   </div>
@@ -61,16 +60,16 @@
 <main id=app></main>
 
 <div id=dock>
-  <div id=bar><span class=grandval>0</span> pozycji</div>
+  <div id=docktop>
+    <div id=meta class=meta></div>
+    <div id=bar><span class=grandval>0</span> pozycji</div>
+  </div>
   <input id=search type=search placeholder="🔍 Szukaj leku / środka / dolegliwości…" autocomplete=off>
-  <div id=meta class=meta></div>
 </div>
-
 <dialog id=docDlg>
   <div class=docbar><b id=docTitle></b><button id=docClose class=btn type=button>✕ Zamknij</button></div>
   <div id=docBody class=md></div>
 </dialog>
-
 <script src="unlock.js?v=4acd5dd7"></script>
 <script src="apteczka.js?v=12b15d1d"></script>
 </body>

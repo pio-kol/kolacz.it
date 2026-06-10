@@ -4,18 +4,17 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <title>🧴 Kosmetyczki — zawartość</title>
-<link rel=stylesheet href="style.css?v=b85a5d6c">
+<link rel=stylesheet href="style.css?v=55f70cf2">
 </head>
 <body class=aptpage>
 <section id=controls>
   <div class=ctlhead>
     <nav class=pagenav>
-      <a class=navlink href="index.html">🎒 Pakowanie</a>
-      <a class=navlink href="apteczka.html">💊 Apteczka</a>
+      <a class="navlink" href="index.html">🎒 Pakowanie</a>
+      <a class="navlink" href="apteczka.html">💊 Apteczka</a>
       <a class="navlink on" href="kosmetyczki.html">🧴 Kosmetyczki</a>
-      <a class=navlink href="jedzenie.html">🍫 Jedzenie</a>
-      <a class=navlink href="nurkowanie.html">🤿 Nurkowanie</a>
-      <a class=navlink href="vademecum.html">🏔️ Choroby górskie</a>
+      <a class="navlink" href="jedzenie.html">🍫 Jedzenie</a>
+      <a class="navlink" href="vademecum.html">🏔️ Choroby górskie</a>
     </nav>
     <button id=filtToggle type=button aria-expanded=false aria-label="Pokaż/ukryj filtry" title="Filtry">▾</button>
   </div>
@@ -32,11 +31,12 @@
 <main id=app></main>
 
 <div id=dock>
-  <div id=bar>RAZEM: <span class=grandval>0</span> · <span class=gcountval>0</span> szt</div>
+  <div id=docktop>
+    <div id=meta class=meta></div>
+    <div id=bar>RAZEM: <span class=grandval>0</span> · <span class=gcountval>0</span> szt</div>
+  </div>
   <input id=search type=search placeholder="🔍 Szukaj kosmetyku…" autocomplete=off>
-  <div id=meta class=meta></div>
 </div>
-
 <script src="unlock.js?v=4acd5dd7"></script>
 <script src="kosmetyczki.js?v=73fb8e11"></script>
 </body>

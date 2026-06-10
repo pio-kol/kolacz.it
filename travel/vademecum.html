@@ -4,17 +4,16 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <title>🏔️ Vademecum — choroby górskie</title>
-<link rel=stylesheet href="style.css?v=b85a5d6c">
+<link rel=stylesheet href="style.css?v=55f70cf2">
 </head>
 <body class=vadpage>
 <section id=controls>
   <div class=ctlhead>
     <nav class=pagenav>
-      <a class=navlink href="index.html">🎒 Pakowanie</a>
-      <a class=navlink href="apteczka.html">💊 Apteczka</a>
-      <a class=navlink href="kosmetyczki.html">🧴 Kosmetyczki</a>
-      <a class=navlink href="jedzenie.html">🍫 Jedzenie</a>
-      <a class=navlink href="nurkowanie.html">🤿 Nurkowanie</a>
+      <a class="navlink" href="index.html">🎒 Pakowanie</a>
+      <a class="navlink" href="apteczka.html">💊 Apteczka</a>
+      <a class="navlink" href="kosmetyczki.html">🧴 Kosmetyczki</a>
+      <a class="navlink" href="jedzenie.html">🍫 Jedzenie</a>
       <a class="navlink on" href="vademecum.html">🏔️ Choroby górskie</a>
     </nav>
   </div>
@@ -31,16 +30,16 @@
 </main>
 
 <div id=dock>
-  <div id=bar><span class=grandval>0</span> sekcji</div>
+  <div id=docktop>
+    <div id=meta class=meta></div>
+    <div id=bar><span class=grandval>0</span> sekcji</div>
+  </div>
   <input id=search type=search placeholder="🔍 Szukaj w dokumencie…" autocomplete=off>
-  <div id=meta class=meta></div>
 </div>
-
 <dialog id=docDlg>
   <div class=docbar><b id=docTitle></b><button id=docClose class=btn type=button>✕ Zamknij</button></div>
   <div id=docBody class=md></div>
 </dialog>
-
 <script src="unlock.js?v=4acd5dd7"></script>
 <script src="vademecum.js?v=fe1ff29e"></script>
 </body>
