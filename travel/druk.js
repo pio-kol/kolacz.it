@@ -62,6 +62,9 @@ function mdToHtml(md) {
 }
 
 // ---- sekcje dokumentu ----
+// eksport = tylko leki POSIADANE; „do kupienia/do rozważenia" (l.kup/l.roz) pomijamy
+// (nie ma sensu drukować ulotek leków, których się nie ma — po zakupie wrócą do katalogu)
+const owned = (l) => !l.kup && !l.roz;
 function lekBlock(l) {
   const badges = (l.rx ? " [Rx]" : "") + (l.kup ? " [do kupienia]" : "") + (l.roz ? " [do rozważenia]" : "");
   const apt = (l.apt || []).map(aptName).join(", ");
@@ -74,7 +77,7 @@ function lekBlock(l) {
     ulot + `</div>`;
 }
 function lekiSec() {
-  const groups = group(DATA.leki || [], l => l.d || "Inne", DATA.dolegliwosci_order);
+  const groups = group((DATA.leki || []).filter(owned), l => l.d || "Inne", DATA.dolegliwosci_order);
   if (!groups.length) return "";
   let s = `<section class=druk-sec><h2>💊 Leki po dolegliwościach</h2>`;
   for (const [k, its] of groups) {
@@ -101,7 +104,7 @@ function apteczkiSec() {
   const order = Object.keys(DATA.apt_nazwy || {});
   let s = `<section class=druk-sec><h2>🧰 Skład apteczek</h2>`, any = false;
   for (const code of order) {
-    const L = (DATA.leki || []).filter(l => (l.apt || []).includes(code)).map(l => ({ n: l.n, typ: "lek", rx: l.rx }));
+    const L = (DATA.leki || []).filter(l => owned(l) && (l.apt || []).includes(code)).map(l => ({ n: l.n, typ: "lek", rx: l.rx }));
     const S = (DATA.srodki || []).filter(x => (x.apt || []).includes(code)).map(x => ({ n: x.n, typ: "środek", rx: false }));
     const its = L.concat(S).sort((a, b) => a.n.localeCompare(b.n, "pl"));
     if (!its.length) continue;
