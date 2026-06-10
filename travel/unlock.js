@@ -6,12 +6,13 @@
 //
 // Sesja odblokowania: po udanym haśle stan "odblokowane" trzymamy w ciasteczku
 // `lm_unlocked` z czasem życia 30 min, a odszyfrowane dane w localStorage (z tym
-// samym terminem). Po wygaśnięciu ciasteczka (lub po kliknięciu 🔒) znów pytamy o
-// hasło. Ikona 🔒 w rogu = wyloguj/zablokuj na żądanie.
+// samym terminem) + zapamiętujemy wersję buildu (`ver` z koperty). Sesja wygasa,
+// gdy: minie 30 min, klikniesz 🔒, albo wdrożono NOWĄ wersję (inny `ver`).
+// Ikona 🔒 w rogu = wyloguj/zablokuj na żądanie.
 "use strict";
 window.LM = (function () {
   const LS = window.localStorage;
-  const DATA = "lm:data", EXP = "lm:exp", COOKIE = "lm_unlocked";
+  const DATA = "lm:data", EXP = "lm:exp", VER = "lm:ver", COOKIE = "lm_unlocked";
   const TTL = 30 * 60;                                  // 30 minut (w sekundach)
   const enc = new TextEncoder(), dec = new TextDecoder();
   const b64 = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0));
@@ -22,7 +23,7 @@ window.LM = (function () {
   const hasCookie = () =>
     document.cookie.split("; ").some(c => c.indexOf(COOKIE + "=") === 0);
   const clearSession = () => {
-    try { LS.removeItem(DATA); LS.removeItem(EXP); } catch (_) {}
+    try { LS.removeItem(DATA); LS.removeItem(EXP); LS.removeItem(VER); } catch (_) {}
     document.cookie = COOKIE + "=; max-age=0; path=/; SameSite=Strict";
   };
 
@@ -39,9 +40,9 @@ window.LM = (function () {
       { name: "AES-GCM", iv: b64(env.iv) }, key, b64(env.ct));
     return dec.decode(pt);                 // rzuci przy złym haśle (niezgodny tag GCM)
   }
-  function remember(txt) {
+  function remember(txt, ver) {
     const exp = Date.now() + TTL * 1000;
-    try { LS.setItem(DATA, txt); LS.setItem(EXP, String(exp)); } catch (_) {}
+    try { LS.setItem(DATA, txt); LS.setItem(EXP, String(exp)); LS.setItem(VER, ver || ""); } catch (_) {}
     setCookie(TTL);
   }
 
@@ -77,7 +78,7 @@ window.LM = (function () {
       try {
         const txt = await decryptEnv(env, inp.value);
         const data = JSON.parse(txt);
-        remember(txt);
+        remember(txt, env.ver);
         ov.remove(); document.body.classList.remove("locked");
         addLockBtn();
         onReady(data);
@@ -96,8 +97,10 @@ window.LM = (function () {
     catch (e) { document.body.innerHTML = "<p style='padding:2rem'>Nie udało się wczytać danych (" + e + ").</p>"; return; }
     if (!isEnv(raw)) { onReady(raw); return; }          // plaintext (lokalnie / repo prywatne)
     // ważna sesja: ciasteczko (≤30 min) + dane w localStorage nieprzeterminowane
+    // + ta sama wersja buildu (nowy deploy ⇒ sesja wygasa, pytamy o hasło ponownie)
     const exp = +(LS.getItem(EXP) || 0), cached = LS.getItem(DATA);
-    if (hasCookie() && cached && Date.now() < exp) {
+    const sameVer = LS.getItem(VER) === (raw.ver || "");
+    if (hasCookie() && cached && sameVer && Date.now() < exp) {
       try { addLockBtn(); return onReady(JSON.parse(cached)); } catch (_) { clearSession(); }
     }
     clearSession();
