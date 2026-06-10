@@ -4,35 +4,27 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <title>Travel assistant</title>
-<meta name=description content="Travel assistant — 🍫 Jedzenie i picie">
+<meta name=description content="Travel assistant — 🖨️ Offline / PDF — dane medyczne">
 <link rel=icon href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧭%3C/text%3E%3C/svg%3E">
 <link rel=stylesheet href="style.css?v=bfc410e5">
 </head>
-<body class=aptpage>
+<body>
 <section id=controls>
   <div class=ctlhead>
     <nav class=pagenav>
       <a class="navlink" href="index.html">🎒 Pakowanie</a>
       <a class="navlink" href="kosmetyczki.html">🧴 Kosmetyczka</a>
-      <a class="navlink on" href="jedzenie.html">🍫 Jedzenie</a>
+      <a class="navlink" href="jedzenie.html">🍫 Jedzenie</a>
       <a class="navlink" href="apteczka.html">💊 Apteczka</a>
       <a class="navlink" href="vademecum.html">🏔️ Choroby górskie</a>
-      <a class="navlink" href="druk.html">🖨️ Offline / PDF</a>
+      <a class="navlink on" href="druk.html">🖨️ Offline / PDF</a>
     </nav>
   </div>
-  <nav id=catnav class=catnav></nav>
 </section>
 
-<main id=app></main>
+<main id=druk></main>
 
-<div id=dock>
-  <div id=docktop>
-    <div id=meta class=meta></div>
-    <div id=bar>RAZEM: <span class=grandval>0</span> · <span class=gcountval>0</span> szt</div>
-  </div>
-  <input id=search type=search placeholder="🔍 Szukaj jedzenia / picia…" autocomplete=off>
-</div>
 <script src="unlock.js?v=4acd5dd7"></script>
-<script src="jedzenie.js?v=2c65ad36"></script>
+<script src="druk.js?v=f95e9f6a"></script>
 </body>
 </html>
