@@ -126,7 +126,7 @@ function szczSec() {
     g[k].forEach(z => { const r = (byName[z.n] = byName[z.n] || { n: z.n, dates: [] }); if (z.data) r.dates.push(z.data); });
     const rows = Object.values(byName); rows.forEach(r => r.dates.sort((a, b) => b.localeCompare(a)));
     s += `<h3>${esc(k)}</h3><ul class=druk-list>`;
-    for (const r of rows) s += `<li>${esc(r.n)}${r.dates.length ? ` <span class=dim>— ${r.dates.map(esc).join(", ")}</span>` : ""}</li>`;
+    for (const r of rows) s += `<li>${esc(r.n)} <span class=dim>— ${r.dates.length ? r.dates.map(esc).join(", ") : "dzieciństwo"}</span></li>`;
     s += `</ul>`;
   }
   return s + `</section>`;

@@ -250,7 +250,7 @@ function kitRow(it) {
 function szczRow(s) {
   const dates = (s.dates && s.dates.length)
     ? s.dates.map(d => `<span class=waz title="data szczepienia">📅 ${esc(d)}</span>`).join("")
-    : `<span class="waz" title="data nieznana">📅 —</span>`;
+    : `<span class="waz" title="szczepienie z dzieciństwa (data nieznana)">👶 dzieciństwo</span>`;
   return `<div class=arow><div class=aname>${esc(s.n)}</div>
     <div class=ameta>${dates}</div></div>`;
 }
