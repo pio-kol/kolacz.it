@@ -239,14 +239,15 @@ function srRow(s) {
   return `<div class=arow><div class=aname>${esc(s.n)}</div>
     <div class=ameta>${aptChips(s.apt)}</div></div>`;
 }
+// jeden wiersz na szczepionkę; jeśli było kilka dawek — kilka dat (znaczników) w wierszu
 function szczRow(s) {
-  const d = s.data ? `<span class=waz title="data szczepienia">📅 ${esc(s.data)}</span>`
-                   : `<span class="waz" title="data nieznana">📅 —</span>`;
-  return `<div class=arow><div class=aname>${esc(s.n)}</div>
-    <div class=ameta>${d}</div></div>`;
+  const dates = (s.dates && s.dates.length)
+    ? s.dates.map(d => `<span class=waz title="data szczepienia">📅 ${esc(d)}</span>`).join("")
+    : `<span class="waz" title="data nieznana">📅 —</span>`;
+  const cnt = s.dates.length > 1 ? ` <span class=sub>${s.dates.length}× dawki</span>` : "";
+  return `<div class=arow><div class=aname>${esc(s.n)}${cnt}</div>
+    <div class=ameta>${dates}</div></div>`;
 }
-// najnowsze daty na górze; wpisy bez daty na końcu grupy
-function szczSort(a, b) { return (b.data || "").localeCompare(a.data || ""); }
 const secId = (s) => "sec-" + dePL(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 function renderCatnav(groups) {
   const nav = $("#catnav"); if (!nav) return;
@@ -285,14 +286,24 @@ function render() {
     html = sections(groups, lekRow, true);
   } else if (STATE.tab === "szczepienia") {
     const Z = (DATA.szczepienia || []).filter(searchSzcz);
-    n = Z.length;
-    // grupuj po chorobie/celu; w grupie sortuj po dacie (najnowsze na górze)
+    // grupuj po chorobie/celu; w grupie scal po nazwie (kilka dawek → jeden wiersz, kilka dat)
     const g = {};
     Z.forEach(z => { const k = z.choroba || "Inne"; (g[k] = g[k] || []).push(z); });
     const ord = DATA.szczepienia_order || [];
     const keys = ord.filter(k => g[k])
       .concat(Object.keys(g).filter(k => !ord.includes(k)).sort((a, b) => a.localeCompare(b, "pl")));
-    const groups = keys.map(k => [k, g[k].sort(szczSort)]);
+    const groups = keys.map(k => {
+      const byName = {};
+      g[k].forEach(z => {
+        const r = (byName[z.n] = byName[z.n] || { n: z.n, dates: [] });
+        if (z.data) r.dates.push(z.data);
+      });
+      const rows = Object.values(byName);
+      rows.forEach(r => r.dates.sort((a, b) => b.localeCompare(a)));   // najnowsza data pierwsza
+      rows.sort((a, b) => (b.dates[0] || "").localeCompare(a.dates[0] || ""));
+      return [k, rows];
+    });
+    n = groups.reduce((a, [, rows]) => a + rows.length, 0);
     renderCatnav(groups);
     html = sections(groups, szczRow);
   } else {

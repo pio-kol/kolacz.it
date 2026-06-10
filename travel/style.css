@@ -132,9 +132,9 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .navlink.on { background: #1f6feb; border-color: #1f6feb; color: #fff; }
 
 /* ---- zakładki (apteczka: leki / środki) ---- */
-.tabs { display: flex; gap: 6px; width: 100%; max-width: 680px; }   /* nie rozciągaj na całą szerokość desktopu */
-.tab {
-  flex: 1; font: inherit; font-size: 13px; font-weight: 600; padding: 9px 8px;
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab {                                  /* rozmiar wg treści — nie rozciągaj na całą szerokość */
+  flex: 0 1 auto; font: inherit; font-size: 13px; font-weight: 600; padding: 9px 16px;
   border: 1px solid #c4c9d0; border-radius: 8px; background: #fff; cursor: pointer;
   white-space: nowrap;
 }
