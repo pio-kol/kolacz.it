@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang=pl>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>💊 Apteczka — leki i środki</title>
+<link rel=stylesheet href="style.css?v=d3008142">
+</head>
+<body class=aptpage>
+<section id=controls>
+  <div class=ctlhead>
+    <nav class=pagenav>
+      <a class=navlink href="index.html">🎒 Pakowanie</a>
+      <a class="navlink on" href="apteczka.html">💊 Apteczka</a>
+      <a class=navlink href="kosmetyczki.html">🧴 Kosmetyczki</a>
+      <a class=navlink href="jedzenie.html">🍫 Jedzenie</a>
+      <a class=navlink href="nurkowanie.html">🤿 Nurkowanie</a>
+      <a class=navlink href="vademecum.html">🏔️ Choroby górskie</a>
+    </nav>
+    <button id=filtToggle type=button aria-expanded=false aria-label="Pokaż/ukryj filtry" title="Filtry">▾</button>
+  </div>
+  <div id=meta class=meta></div>
+  <div class=ctlrow>
+    <div id=tabs class=tabs>
+      <button class="tab on" data-tab=leki type=button>💊 Leki po dolegliwościach</button>
+      <button class=tab data-tab=srodki type=button>🩹 Środki wg kategorii</button>
+      <button class=tab data-tab=szczepienia type=button>💉 Szczepienia</button>
+    </div>
+  </div>
+  <div id=ctlbody class=collapsed>
+  <div class=ctlrow><div id=guides class=guides></div></div>
+  <div class=ctlrow>
+    <label class=fld id=aptWrap>Apteczka
+      <select id=aptFilter><option value="">— wszystkie —</option></select>
+    </label>
+    <label class=fld id=rxWrap>Recepta
+      <select id=rxFilter>
+        <option value=all>wszystkie</option>
+        <option value=rx>tylko Rx</option>
+        <option value=otc>bez recepty</option>
+      </select>
+    </label>
+    <label class=fld id=locWrap>Lokalizacja
+      <select id=locFilter>
+        <option value=mam selected>✅ posiadane</option>
+        <option value=all>wszystkie (z do kupienia/rozważenia)</option>
+        <option value=mlp>🧰 Mountain Leader Pro</option>
+        <option value=forclaz>🧰 Sztywne Etui Forclaz</option>
+        <option value=sol-czarny>🧰 Solognac — czarny</option>
+        <option value=sol-zielony>🧰 Solognac — zielony</option>
+        <option value=sol>🧰 Solognac</option>
+        <option value=dom>🏠 w domu</option>
+        <option value=kup>🛒 do kupienia</option>
+        <option value=rozw>🤔 do rozważenia</option>
+      </select>
+    </label>
+  </div>
+  </div>
+  <nav id=catnav class=catnav></nav>
+</section>
+
+<main id=app></main>
+
+<div id=dock>
+  <div id=bar><span class=grandval>0</span> pozycji</div>
+  <input id=search type=search placeholder="🔍 Szukaj leku / środka / dolegliwości…" autocomplete=off>
+</div>
+
+<dialog id=docDlg>
+  <div class=docbar><b id=docTitle></b><button id=docClose class=btn type=button>✕ Zamknij</button></div>
+  <div id=docBody class=md></div>
+</dialog>
+
+<script src="unlock.js?v=5a95c600"></script>
+<script src="apteczka.js?v=2936c7e9"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang=pl>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>🎒 Pakowanie — kalkulator</title>
+<link rel=stylesheet href="style.css?v=d3008142">
+</head>
+<body>
+<section id=controls>
+  <div class=ctlhead>
+    <nav class=pagenav>
+      <a class="navlink on" href="index.html">🎒 Pakowanie</a>
+      <a class=navlink href="apteczka.html">💊 Apteczka</a>
+      <a class=navlink href="kosmetyczki.html">🧴 Kosmetyczki</a>
+      <a class=navlink href="jedzenie.html">🍫 Jedzenie</a>
+      <a class=navlink href="nurkowanie.html">🤿 Nurkowanie</a>
+      <a class=navlink href="vademecum.html">🏔️ Choroby górskie</a>
+    </nav>
+    <button id=filtToggle type=button aria-expanded=false aria-label="Pokaż/ukryj filtry" title="Filtry">▾</button>
+  </div>
+  <div id=ctlbody class=collapsed>
+  <div id=meta class=meta></div>
+  <div class=ctlrow>
+    <label class=fld>Wyjazd (preset)
+      <select id=trip></select>
+    </label>
+    <label class=fld>Pasmo wysokości
+      <select id=pasmo></select>
+    </label>
+    <label class=fld>Zakres temperatur
+      <select id=temp></select>
+    </label>
+    <label class=fld>Śnieg / lód
+      <select id=lod>
+        <option value=dowolnie>dowolnie</option>
+        <option value=tak>tak</option>
+        <option value=nie>nie</option>
+      </select>
+    </label>
+  </div>
+  <div class=tagswrap>
+    <div class=lbl>Tagi</div>
+    <div id=tags class=tags></div>
+  </div>
+  <div class=ctlrow>
+    <button id=printBtn type=button class=btn>📄 Lista (PDF)</button>
+    <button id=resetBtn type=button class=btn>↺ Reset ilości</button>
+    <button id=exportBtn type=button class=btn>⬇ Eksport YAML</button>
+  </div>
+  <div id=celinfo class=celinfo></div>
+  </div>
+  <nav id=catnav class=catnav></nav>
+</section>
+
+<main id=app></main>
+
+<div id=checklist></div>
+
+<div id=dock>
+  <div id=bar>RAZEM: <span class=grandval>0</span> · <span class=gcountval>0</span> szt</div>
+  <input id=search type=search placeholder="🔍 Szukaj rzeczy…" autocomplete=off>
+</div>
+
+<dialog id=exportDlg>
+  <h3>Wklej do <code>wyjazdy.yaml</code> (pod wybranym wyjazdem)</h3>
+  <p class=small>Twoje zmiany ilości względem domyślnych: 0 → <code>usun</code>,
+     inna liczba → <code>ilosc</code>, rzeczy dodane spoza listy → <code>dodaj</code>.</p>
+  <textarea id=exportTxt rows=14 readonly></textarea>
+  <div class=dlgbtns>
+    <button id=copyBtn type=button class=btn>Kopiuj</button>
+    <button id=exportClose type=button class=btn>Zamknij</button>
+  </div>
+</dialog>
+
+<script src="unlock.js?v=5a95c600"></script>
+<script src="app.js?v=1d762f9b"></script>
+</body>
+</html>
