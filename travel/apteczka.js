@@ -239,6 +239,17 @@ function srRow(s) {
   return `<div class=arow><div class=aname>${esc(s.n)}</div>
     <div class=ameta>${aptChips(s.apt)}</div></div>`;
 }
+// wiersz „Produktów medycznych" (nie-leki): nazwa + typ + substancja/opis + apteczki
+function pmRow(l) {
+  const inf = (DATA.ulotki && DATA.ulotki[l.n])
+    ? ` <button class="docbtn ibtn" data-doc="u:${esc(l.n)}" title="Opis">📖</button>` : "";
+  const typ = `<span class="badge pm">${esc(l.pm)}</span>`;
+  const subst = l.s ? `<div class=subst>🧪 ${esc(l.s)}</div>` : "";
+  const opis = l.na ? `<div class=opis>${esc(l.na)}</div>` : "";
+  const f = l.f ? `<span class=forma>${esc(l.f)}</span>` : "";
+  return `<div class=arow><div class=aname>${esc(l.n)}${inf}${typ}</div>
+    ${subst}${opis}<div class=ameta>${f}${wazBadge(l.w)}${aptChips(l.apt)}</div></div>`;
+}
 // jeden wiersz na szczepionkę; jeśli było kilka dawek — kilka dat (znaczników) w wierszu
 // wiersz w widoku „Skład apteczek": nazwa + znacznik typu (lek/środek) + Rx
 function kitRow(it) {
@@ -278,7 +289,7 @@ function render() {
   writeUrl();
   let html = "", n = 0;
   if (STATE.tab === "leki") {
-    let L = (DATA.leki || []).filter(l => matchApt(l.apt) && searchLek(l));
+    let L = (DATA.leki || []).filter(l => !l.pm && matchApt(l.apt) && searchLek(l));
     if (STATE.rx === "rx") L = L.filter(l => l.rx);
     else if (STATE.rx === "otc") L = L.filter(l => !l.rx);
     if (STATE.loc === "mam") {            // domyślnie: tylko posiadane (bez do kupienia / do rozważenia)
@@ -318,7 +329,7 @@ function render() {
     const order = Object.keys(DATA.apt_nazwy || {});
     const groups = order.map(code => {
       const L = (DATA.leki || []).filter(l => (l.apt || []).includes(code))
-        .map(l => ({ n: l.n, typ: "lek", rx: l.rx }));
+        .map(l => ({ n: l.n, typ: l.pm || "lek", rx: l.rx }));
       const S = (DATA.srodki || []).filter(s => (s.apt || []).includes(code))
         .map(s => ({ n: s.n, typ: "środek" }));
       let its = L.concat(S).sort((a, b) => a.n.localeCompare(b.n, "pl"));
@@ -328,6 +339,13 @@ function render() {
     n = groups.reduce((a, [, its]) => a + its.length, 0);
     renderCatnav(groups);
     html = sections(groups, kitRow);
+  } else if (STATE.tab === "produkty") {
+    // nie-leki: wyroby medyczne / kosmetyki / suplementy — do decyzji, co z nimi zrobić
+    const P = (DATA.leki || []).filter(l => l.pm && searchLek(l));
+    n = P.length;
+    const groups = group(P, l => l.pm, ["wyrób medyczny", "kosmetyk", "suplement", "surowiec"]);
+    renderCatnav(groups);
+    html = sections(groups, pmRow);
   } else {
     const S = (DATA.srodki || []).filter(s => matchApt(s.apt) && searchSr(s));
     n = S.length;

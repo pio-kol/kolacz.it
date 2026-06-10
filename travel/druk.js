@@ -77,7 +77,7 @@ function lekBlock(l) {
     ulot + `</div>`;
 }
 function lekiSec() {
-  const groups = group((DATA.leki || []).filter(owned), l => l.d || "Inne", DATA.dolegliwosci_order);
+  const groups = group((DATA.leki || []).filter(l => owned(l) && !l.pm), l => l.d || "Inne", DATA.dolegliwosci_order);
   if (!groups.length) return "";
   let s = `<section class=druk-sec><h2>💊 Leki po dolegliwościach</h2>`;
   for (const [k, its] of groups) {
