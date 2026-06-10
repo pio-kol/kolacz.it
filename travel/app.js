@@ -108,6 +108,13 @@ function init() {
     history.replaceState(null, "", location.pathname + location.search + "#" + a.dataset.sec);
     scrollToSec(a.dataset.sec);
   };
+  // klik w nagłówek sekcji (np. „Buty") = link do sekcji: aktualizuje URL i przewija
+  $("#app").addEventListener("click", (e) => {
+    const a = e.target.closest(".seclink"); if (!a) return;
+    e.preventDefault();
+    history.replaceState(null, "", location.pathname + location.search + "#" + a.dataset.sec);
+    scrollToSec(a.dataset.sec);
+  });
   let lastY = 0;
   window.addEventListener("scroll", () => {
     const y = window.scrollY || 0;
@@ -277,7 +284,7 @@ function scrollToSec(id) {
 
 function sectionsHtml(groups) {
   return groups.map(([fn, items]) =>
-    `<section class="cat sec" id="${secId(fn)}"><h3><span>${esc(fn)}</span><span class=sub>—</span></h3>
+    `<section class="cat sec" id="${secId(fn)}"><h3><a class=seclink href="#${secId(fn)}" data-sec="${secId(fn)}">${esc(fn)}</a><span class=sub>—</span></h3>
      <table><tr><th>Rzecz</th><th class=q>Ilość</th><th class=n>g/szt</th><th class=n>Razem</th></tr>
      ${items.map(rowHtml).join("")}</table></section>`).join("");
 }
