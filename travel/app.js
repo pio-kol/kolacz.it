@@ -49,7 +49,7 @@ LM.unlock(d => { DATA = d; init(); });          // szyfrowanie klienta: odblokuj
 
 function init() {
   $("#meta").textContent =
-    `baza: ${DATA.items.length} rzeczy · ${DATA.wyjazdy.length} wyjazdów · wersja ${DATA.commit || DATA.generated}`;
+    `baza: ${DATA.items.length} rzeczy · ${DATA.wyjazdy.length} wyjazdów · ${DATA.built || DATA.generated} · ${DATA.commit || ""}`;
 
   // presety wyjazdów
   const trip = $("#trip");

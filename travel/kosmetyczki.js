@@ -31,7 +31,7 @@ function init() {
   const order = (DATA.kosmetyczki_order || Object.keys(K));
   const total = order.reduce((s, c) => s + ((K[c] && K[c].items || []).length), 0);
   $("#meta").textContent =
-    `${order.length} kosmetyczki · ${total} pozycji · wersja ${DATA.commit || DATA.generated}`;
+    `${order.length} kosmetyczki · ${total} pozycji · ${DATA.built || DATA.generated} · ${DATA.commit || ""}`;
 
   $("#kosmFilter").innerHTML = '<option value="">— wszystkie —</option>' +
     order.map(c => `<option value="${esc(c)}">${esc((K[c] || {}).n || c)}</option>`).join("");

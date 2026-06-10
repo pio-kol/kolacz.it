@@ -155,7 +155,7 @@ function highlight(q) {
 function init() {
   const md = DATA.vademecum;
   if (!md) { $("#doc").innerHTML = "<p class=empty>Brak dokumentu w data.json.</p>"; return; }
-  $("#meta").textContent = `Vademecum chorób górskich · wersja ${DATA.commit || DATA.generated}`;
+  $("#meta").textContent = `Vademecum chorób górskich · ${DATA.built || DATA.generated} · ${DATA.commit || ""}`;
   $("#doc").innerHTML = mdToHtml(md);
   buildToc();
   injectLeki();

@@ -28,7 +28,7 @@ function readUrl() {
 function init() {
   const its = diveItems();
   $("#meta").textContent =
-    `${its.length} pozycji · nurkowanie / woda · wersja ${DATA.commit || DATA.generated}`;
+    `${its.length} pozycji · nurkowanie / woda · ${DATA.built || DATA.generated} · ${DATA.commit || ""}`;
   let t;
   $("#search").oninput = e => {
     STATE.q = e.target.value.trim();

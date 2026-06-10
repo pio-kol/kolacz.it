@@ -38,7 +38,7 @@ function readUrl() {
 function init() {
   const leki = DATA.leki || [], srodki = DATA.srodki || [], szcz = DATA.szczepienia || [];
   $("#meta").textContent =
-    `${leki.length} leków · ${srodki.length} środków · ${szcz.length} szczepień · wersja ${DATA.commit || DATA.generated}`;
+    `${leki.length} leków · ${srodki.length} środków · ${szcz.length} szczepień · ${DATA.built || DATA.generated} · ${DATA.commit || ""}`;
 
   // apteczki do filtra: wszystkie kody występujące w lekach/środkach
   const codes = new Set();

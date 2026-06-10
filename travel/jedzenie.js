@@ -43,7 +43,7 @@ function readUrl() {
 function init() {
   const its = foodItems();
   $("#meta").textContent =
-    `${its.length} pozycji · jedzenie i picie · wersja ${DATA.commit || DATA.generated}`;
+    `${its.length} pozycji · jedzenie i picie · ${DATA.built || DATA.generated} · ${DATA.commit || ""}`;
   let t;
   $("#search").oninput = e => {
     STATE.q = e.target.value.trim();
