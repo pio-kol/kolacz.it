@@ -236,11 +236,18 @@ function compute() {
 }
 
 const ROZ_FUN = "🤔 Do rozważenia";
+// temperatura z nazwy (np. "−30°C", "+5°C") → liczba; do sortowania śpiworów od najcieplejszego
+const tempKey = (n) => { const m = String(n).match(/([+\-−]?\d+)\s*°C/); return m ? +m[1].replace("−", "-") : null; };
+function cmpItems(a, b) {
+  const ta = tempKey(a.n), tb = tempKey(b.n);
+  if (ta != null && tb != null) return tb - ta;     // oba z temperaturą: cieplejszy pierwszy (+5, −10, −30)
+  return a.n.localeCompare(b.n, "pl");
+}
 function groupByFun(items) {
   const g = {};
   items.forEach(it => { const fn = it.roz ? ROZ_FUN : it.f; (g[fn] = g[fn] || []).push(it); });
   return DATA.fun_order.concat([ROZ_FUN]).filter(fn => g[fn])
-    .map(fn => [fn, g[fn].sort((a, b) => a.n.localeCompare(b.n, "pl"))]);
+    .map(fn => [fn, g[fn].sort(cmpItems)]);
 }
 
 // ---------- render ----------
@@ -249,10 +256,9 @@ function rowHtml(it) {
   const owned = it._apt ? 1 : (it.q || 1);          // limit = ile posiadasz
   const q = Math.min(qtyOf(it), owned);
   const ut = u ? String(u) : "—";
-  const uw = it.u ? ` <span class=uwg title="${esc(it.u)}">ⓘ</span>` : "";
   const pw = it._r ? ` <span class=powod>(${esc(it._r)})</span>` : "";
   return `<tr class="row${q === 0 ? " off" : ""}" data-name="${esc(it.n)}" data-w="${u}" data-max="${owned}" data-def="${defQty(it)}"${it._apt ? " data-apt=1" : ""}${it._excl ? " data-excl=1" : ""}>
-    <td>${esc(it.n)}${uw}${pw}</td>
+    <td>${esc(it.n)}${pw}</td>
     <td class=qtycell><button type=button class=minus>−</button><span class=qty><span class=qv>${q}</span><span class=qmax>/${owned}</span></span><button type=button class=plus>+</button></td>
     <td class=n>${ut}</td><td class="n rt">${fmt(u * q)}</td></tr>`;
 }
