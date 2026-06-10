@@ -240,12 +240,18 @@ function srRow(s) {
     <div class=ameta>${aptChips(s.apt)}</div></div>`;
 }
 // jeden wiersz na szczepionkę; jeśli było kilka dawek — kilka dat (znaczników) w wierszu
+// wiersz w widoku „Skład apteczek": nazwa + znacznik typu (lek/środek) + Rx
+function kitRow(it) {
+  const typ = `<span class=sub>${it.typ}</span>`;
+  const rx = it.rx ? ' <span class="badge rx">Rx</span>' : "";
+  return `<div class=arow><div class=aname>${esc(it.n)}${rx}</div>
+    <div class=ameta>${typ}</div></div>`;
+}
 function szczRow(s) {
   const dates = (s.dates && s.dates.length)
     ? s.dates.map(d => `<span class=waz title="data szczepienia">📅 ${esc(d)}</span>`).join("")
     : `<span class="waz" title="data nieznana">📅 —</span>`;
-  const cnt = s.dates.length > 1 ? ` <span class=sub>${s.dates.length}× dawki</span>` : "";
-  return `<div class=arow><div class=aname>${esc(s.n)}${cnt}</div>
+  return `<div class=arow><div class=aname>${esc(s.n)}</div>
     <div class=ameta>${dates}</div></div>`;
 }
 const secId = (s) => "sec-" + dePL(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -306,6 +312,22 @@ function render() {
     n = groups.reduce((a, [, rows]) => a + rows.length, 0);
     renderCatnav(groups);
     html = sections(groups, szczRow);
+  } else if (STATE.tab === "apteczki") {
+    // skład każdej apteczki: leki (po `apt`) + środki (wyposażenie) w danym pojemniku
+    const q = dePL(STATE.q);
+    const order = Object.keys(DATA.apt_nazwy || {});
+    const groups = order.map(code => {
+      const L = (DATA.leki || []).filter(l => (l.apt || []).includes(code))
+        .map(l => ({ n: l.n, typ: "lek", rx: l.rx }));
+      const S = (DATA.srodki || []).filter(s => (s.apt || []).includes(code))
+        .map(s => ({ n: s.n, typ: "środek" }));
+      let its = L.concat(S).sort((a, b) => a.n.localeCompare(b.n, "pl"));
+      if (q) its = its.filter(it => dePL(it.n).includes(q));
+      return [aptName(code), its];
+    }).filter(([, its]) => its.length);
+    n = groups.reduce((a, [, its]) => a + its.length, 0);
+    renderCatnav(groups);
+    html = sections(groups, kitRow);
   } else {
     const S = (DATA.srodki || []).filter(s => matchApt(s.apt) && searchSr(s));
     n = S.length;
