@@ -46,14 +46,14 @@ window.LM = (function () {
     setCookie(TTL);
   }
 
-  // mała ikona 🔒 w rogu — wyloguj/zablokuj na żądanie (tylko gdy dane są chronione)
+  // ikona 🔒 w nagłówku, obok przycisku filtrów (góra, prawo) — wyloguj na żądanie
   function addLockBtn() {
     if (document.getElementById("lmLock")) return;
     const b = document.createElement("button");
     b.id = "lmLock"; b.className = "lmlock"; b.type = "button";
     b.title = "Zablokuj (wyloguj)"; b.textContent = "🔒";
     b.onclick = () => lock();
-    document.body.appendChild(b);
+    (document.querySelector(".ctlhead") || document.body).appendChild(b);
   }
 
   function lockScreen(env, onReady) {
