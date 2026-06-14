@@ -6,6 +6,13 @@
 <title>Travel assistant</title>
 <meta name=description content="Travel assistant — 🍫 Jedzenie i picie">
 <link rel=icon href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧭%3C/text%3E%3C/svg%3E">
+<link rel=manifest href="manifest.webmanifest?v=382bd985">
+<meta name=theme-color content="#1f6feb">
+<meta name=mobile-web-app-capable content=yes>
+<meta name=apple-mobile-web-app-capable content=yes>
+<meta name=apple-mobile-web-app-status-bar-style content=default>
+<meta name=apple-mobile-web-app-title content="Travel">
+<link rel=apple-touch-icon href="apple-touch-icon.png">
 <link rel=stylesheet href="style.css?v=b77135d5">
 </head>
 <body class=aptpage>
@@ -34,5 +41,6 @@
 </div>
 <script src="unlock.js?v=4acd5dd7"></script>
 <script src="jedzenie.js?v=2c65ad36"></script>
+<script>if('serviceWorker'in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});</script>
 </body>
 </html>
