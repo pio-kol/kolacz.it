@@ -1,10 +1,12 @@
 /* Service worker — Travel assistant PWA.
- * Strategia: stale-while-revalidate dla wszystkich GET-ów z tego origin.
- * Aplikacja jest statyczna (HTML/CSS/JS + data.json), więc działa w pełni
- * offline po pierwszym otwarciu. Cache-busting (?v=hash) na assetach sprawia,
- * że nowe wersje same wchodzą do cache'u przy kolejnym fetchu.
+ * Strategia: network-first dla wszystkich GET-ów z tego origin.
+ * Online → zawsze najnowsza wersja (i odświeżenie cache'u na później).
+ * Offline / błąd sieci → odpowiedź z cache'u (app-shell + data.json precache'owane
+ * przy instalacji), więc apteczka i vademecum działają bez sieci.
+ * Uwaga: przy słabym/kapryśnym zasięgu fetch może chwilę „wisieć", zanim spadnie
+ * do cache'u — najpewniejszy fallback to wtedy tryb samolotowy (sieć pada od razu).
  * Ścieżki względne — działa zarówno na /life-manager/ (Pages), jak i /travel/. */
-const CACHE = "travel-assistant-v1";
+const CACHE = "travel-assistant-v2";
 
 // App shell: nawigacje + rdzeń. Adres względem zasięgu (scope) SW.
 const CORE = [
@@ -49,21 +51,22 @@ self.addEventListener("fetch", (e) => {
 
   e.respondWith(
     caches.open(CACHE).then(async (cache) => {
-      const cached = await cache.match(req);
-      const network = fetch(req)
-        .then((resp) => {
-          if (resp && resp.status === 200 && resp.type === "basic") {
-            cache.put(req, resp.clone());
-          }
-          return resp;
-        })
-        .catch(() => null);
-      // szybki cache, świeżość w tle; offline → cache; nawigacja bez cache → index
-      return (
-        cached ||
-        (await network) ||
-        (req.mode === "navigate" ? cache.match("./index.html") : undefined)
-      );
+      try {
+        const resp = await fetch(req);
+        if (resp && resp.status === 200 && resp.type === "basic") {
+          cache.put(req, resp.clone());          // odśwież cache na potrzeby offline
+        }
+        return resp;
+      } catch (_) {
+        // offline / błąd → cache; nawigacja bez trafienia → index
+        const cached = await cache.match(req);
+        return (
+          cached ||
+          (req.mode === "navigate"
+            ? await cache.match("./index.html")
+            : Response.error())
+        );
+      }
     })
   );
 });
